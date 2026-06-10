@@ -1,0 +1,41 @@
+{
+  "name": "@feryardiant/learn-viteplus",
+  "version": "0.0.0",
+  "private": true,
+  "homepage": "https://github.com/feryardiant/learn-viteplus#readme",
+  "bugs": {
+    "url": "https://github.com/feryardiant/learn-viteplus/issues"
+  },
+  "license": "MIT",
+  "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "tools/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "ready": "vp check && vp run -r test && vp run -r build",
+    "dev": "vp run website#dev",
+    "prepare": "vp config"
+  },
+  "devDependencies": {
+    "vite-plus": "catalog:"
+  },
+  "overrides": {
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "bun@1.3.14",
+  "catalog": {
+    "@types/node": "^24.13.1",
+    "bumpp": "^11.1.0",
+    "typescript": "~6.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
+    "vite-plus": "latest"
+  }
+}

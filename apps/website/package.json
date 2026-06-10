@@ -1,0 +1,24 @@
+{
+  "name": "@feryardiant/learn-viteplus-website",
+  "version": "0.0.0",
+  "private": true,
+  "homepage": "https://github.com/feryardiant/learn-viteplus#readme",
+  "bugs": {
+    "url": "https://github.com/feryardiant/learn-viteplus/issues"
+  },
+  "license": "MIT",
+  "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
+  "repository": {
+    "directory": "apps/website"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "tsc && vp build",
+    "preview": "vp preview"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
