@@ -16,3 +16,7 @@ updates:
       - dependency-name: "typescript"
     labels:
       - dependencies
+    groups:
+      dev-utils:
+        patterns:
+          - "@typescript/native-preview"
