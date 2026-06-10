@@ -5,8 +5,10 @@ export default defineConfig({
     '*': 'vp check --fix',
   },
   fmt: {
+    printWidth: 120,
     singleQuote: true,
     semi: false,
+    sortImports: true,
   },
   lint: {
     jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
