@@ -16,7 +16,7 @@
   "type": "module",
   "scripts": {
     "ready": "vp check && vp run -r test && vp run -r build",
-    "dev": "vp run website#dev",
+    "dev": "vp run @feryardiant/lvp-web#dev",
     "prepare": "vp config"
   },
   "devDependencies": {

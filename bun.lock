@@ -9,7 +9,7 @@
       },
     },
     "apps/website": {
-      "name": "@feryardiant/learn-viteplus-website",
+      "name": "@feryardiant/lvp-web",
       "version": "0.0.0",
       "devDependencies": {
         "typescript": "catalog:",
@@ -17,7 +17,7 @@
       },
     },
     "packages/utils": {
-      "name": "@feryardiant/learn-viteplus-utils",
+      "name": "@feryardiant/lvp-utils",
       "version": "0.0.0",
       "devDependencies": {
         "@types/node": "catalog:",
@@ -42,9 +42,9 @@
     "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
   },
   "packages": {
-    "@feryardiant/learn-viteplus-utils": ["@feryardiant/learn-viteplus-utils@workspace:packages/utils"],
+    "@feryardiant/lvp-utils": ["@feryardiant/lvp-utils@workspace:packages/utils"],
 
-    "@feryardiant/learn-viteplus-website": ["@feryardiant/learn-viteplus-website@workspace:apps/website"],
+    "@feryardiant/lvp-web": ["@feryardiant/lvp-web@workspace:apps/website"],
 
     "@oxc-project/runtime": ["@oxc-project/runtime@0.133.0", "", {}, "sha512-PkvjA1Lq5++V5S1E6Patr92ZVcieE6EalDr1VJTqv4BnjZdOUC4W3p8k1wMXSd5/2aFP4b/A6N5sg2Bkzcr9vQ=="],
 
