@@ -1,5 +1,5 @@
 name: Code
-run-name: "ci(${{ github.event.workflow_run.head_branch }}): quality check against `${{ github.event.workflow_run.head_sha }}`"
+run-name: 'ci(${{ github.event.workflow_run.head_branch }}): quality check against `${{ github.event.workflow_run.head_sha }}`'
 
 on:
   workflow_run:

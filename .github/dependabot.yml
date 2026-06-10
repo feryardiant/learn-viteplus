@@ -12,11 +12,11 @@ updates:
     open-pull-requests-limit: 10
     versioning-strategy: increase-if-necessary
     ignore:
-      - dependency-name: "@types/node"
-      - dependency-name: "typescript"
+      - dependency-name: '@types/node'
+      - dependency-name: 'typescript'
     labels:
       - dependencies
     groups:
       dev-utils:
         patterns:
-          - "@typescript/native-preview"
+          - '@typescript/native-preview'
