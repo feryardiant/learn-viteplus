@@ -62,5 +62,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy . --project-name=learn-viteplus
+          command: |
+            pages deploy . --project-name=learn-viteplus --branch=${{ github.event.workflow_run.head_branch }}
           gitHubToken: ${{ github.token }}
