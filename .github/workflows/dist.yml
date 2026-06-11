@@ -15,6 +15,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'success'
+    outputs:
+      branch-name: ${{ steps.build.outputs.branch-name }}
+      deploy-env: ${{ steps.build.outputs.deploy-env }}
 
     steps:
       - name: Checkout
@@ -33,7 +36,16 @@ jobs:
         run: vp install
 
       - name: Build
-        run: vp run -r build
+        id: build
+        env:
+          BRANCH_NAME: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          vp run -r build
+
+          DEPLOY_ENV=$([[ "$BRANCH_NAME" == "main" ]] && echo "production" || echo "preview")
+
+          echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "deploy-env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
 
       - name: Store
         uses: actions/upload-artifact@v7
@@ -47,9 +59,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
 
+    env:
+      BRANCH_NAME: ${{ needs.build.outputs.branch-name }}
+
+    environment:
+      name: ${{ needs.build.outputs.deploy-env }}
+      url: ${{ steps.deploy.outputs.deployment-url }}
+
     permissions:
       contents: read
-      deployments: write
 
     steps:
       - name: Prepare
@@ -58,10 +76,10 @@ jobs:
           name: website
 
       - name: Build & Deploy Worker
+        id: deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
-            pages deploy . --project-name=learn-viteplus --branch=${{ github.event.workflow_run.head_branch }}
-          gitHubToken: ${{ github.token }}
+            pages deploy . --project-name=learn-viteplus --branch=${{ env.BRANCH_NAME }}
