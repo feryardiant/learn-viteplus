@@ -29,7 +29,7 @@ const socialLinks: CardLinkProp[] = [
     </div>
 
     <div>
-      <h1>Get started</h1>
+      <h1>Get started!</h1>
       <p>Edit <code>src/main.ts</code> and save to test <code>HMR</code></p>
     </div>
 
