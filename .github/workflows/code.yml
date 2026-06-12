@@ -4,6 +4,7 @@ run-name: 'ci(${{ github.event.pull_request.head.ref || github.ref_name }}): qua
 on:
   pull_request_target:
     branches: [main]
+    types: [opened, synchronize]
   push:
     branches: [main]
 
