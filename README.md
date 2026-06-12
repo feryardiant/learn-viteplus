@@ -87,6 +87,34 @@ Patterns applied:
 
 Per-branch concurrency keys (`cleanup-{branch}`, `Code-{branch}`) serialize runs for the same branch while allowing parallel runs across different branches.
 
+### oxfmt LSP doesn't read config from `vite.config.ts` (in VS Code)
+
+In [`26f38b1`](https://github.com/feryardiant/learn-viteplus/commit/26f38b1d0d428aa1d8f8d648ef916559dda93000) — the oxfmt LSP reads config differently depending on the editor, even though both use the same LSP binary:
+
+| Editor      | Config delivery                                                | Result                                   |
+| ----------- | -------------------------------------------------------------- | ---------------------------------------- |
+| **Zed**     | `initialization_options` in LSP `initialize` handshake         | ✅ Config loaded correctly               |
+| **VS Code** | `workspace/didChangeConfiguration` / `workspace/configuration` | ❌ Config path received but not acted on |
+
+Two root causes:
+
+1. **Extension-side bug** ([oxc-vscode#222](https://github.com/oxc-project/oxc-vscode/issues/222)): The extension sends `fmt.configPath` to the LSP but the LSP's formatter doesn't open/parse the config file. A fix landed in [oxc#21081](https://github.com/oxc-project/oxc/pull/21081) but follow-ups like [oxc#21890](https://github.com/oxc-project/oxc/issues/21890) show `vite.config.ts` still fails LSP deserialization.
+
+2. **`vite.config.ts` import resolution** ([vite-plus#861](https://github.com/voidzero-dev/vite-plus/issues/861), [#930](https://github.com/voidzero-dev/vite-plus/issues/930)): The oxfmt LSP's JS config loader can't resolve `import { defineConfig } from 'vite-plus'`, so parsing the config fails silently and it falls back to defaults (double quotes, semicolons).
+
+**Workaround**: Route non-JS/TS files (YAML, etc.) to dedicated language servers. In `.vscode/settings.json`:
+
+```json
+{
+  "yaml.format.singleQuote": true,
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  }
+}
+```
+
+The CLI (`vp fmt`, `vp check --fix`) works correctly because at runtime Vite+ generates a resolved config file that oxfmt can consume directly.
+
 ## Future Direction
 
 - **Workers & Page Functions**: API routes, middleware, server-side logic
