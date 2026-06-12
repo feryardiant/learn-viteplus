@@ -117,7 +117,7 @@ jobs:
             BRANCH=$(echo "$DEPLOY" | jq -r '.branch')
             DEPLOY_ID=$(echo "$DEPLOY" | jq -r '.id')
 
-            PR_COUNT=$(gh pr list --head "$BRANCH" --state open --json number --jq 'length')
+            PR_COUNT=$(gh pr list --repo "${{ github.repository }}" --head "$BRANCH" --state open --json number --jq 'length')
 
             if [ "$PR_COUNT" -eq 0 ]; then
               echo "No open PR for branch $BRANCH, cleaning up..."
