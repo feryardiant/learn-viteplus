@@ -1,8 +1,8 @@
 name: Cleanup
 run-name: >-
   ${{
-    github.event_name == 'schedule' &&
-    'cleanup: scheduled prune' ||
+    github.event_name == 'schedule' && 'cleanup: scheduled prune' ||
+    github.event_name == 'workflow_dispatch' && 'cleanup: manual prune' ||
     format('cleanup({0}): PR #{1}', github.event.pull_request.head.ref, github.event.pull_request.number)
   }}
 
@@ -12,9 +12,10 @@ on:
     branches: [main]
   schedule:
     - cron: '0 17 * * 5' # Saturday 00:00 GMT+7
+  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.event_name == 'schedule' && 'cleanup-scheduled' || format('cleanup-{0}', github.event.pull_request.head.ref) }}
+  group: ${{ github.event_name == 'schedule' && 'cleanup-scheduled' || github.event_name == 'workflow_dispatch' && 'cleanup-manual' || format('cleanup-{0}', github.event.pull_request.head.ref) }}
   cancel-in-progress: false
 
 env:
@@ -25,7 +26,7 @@ env:
 jobs:
   cleanup:
     name: Cleanup Deployments
-    if: github.event_name != 'schedule'
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
 
     permissions:
@@ -114,7 +115,7 @@ jobs:
 
   prune:
     name: Prune Stale Deployments
-    if: github.event_name == 'schedule'
+    if: github.event_name != 'pull_request_target'
     runs-on: ubuntu-latest
 
     permissions:
