@@ -8,6 +8,7 @@
   "npm.scriptRunner": "vp",
   "oxc.fmt.configPath": "./vite.config.ts",
   "oxc.typeAware": true,
+  "oxc.unusedDisableDirectives": "deny",
   "[javascript]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
