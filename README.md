@@ -57,6 +57,7 @@ Switched to `pull_request_target` + explicit `ref: head.sha` checkout. Same secu
 
 - Deleting an aliased deployment requires `?force=true`
 - Deployments are identified by **branch**, not PR number — creates a race if the same branch name is reused for a new PR before cleanup finishes
+- A PR can have **multiple** CF Pages deployments over its lifetime (new pushes, re-runs). Cleanup must loop over all matching deployments, not just the latest (`head -1`)
 
 ### GitHub Deployments API (see [`27420860064`](https://github.com/feryardiant/learn-viteplus/actions/runs/27420860064) and [this comment](https://github.com/feryardiant/learn-viteplus/pull/4#issuecomment-4692087162))
 
