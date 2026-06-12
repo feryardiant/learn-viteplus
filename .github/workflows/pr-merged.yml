@@ -36,7 +36,7 @@ jobs:
           if [ -n "$DEPLOY_ID" ]; then
             echo "Deleting CF Pages deployment: $DEPLOY_ID"
             curl -s -X DELETE \
-              "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/learn-viteplus/deployments/$DEPLOY_ID" \
+              "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/learn-viteplus/deployments/$DEPLOY_ID?force=true" \
               -H "Authorization: Bearer $CF_API_TOKEN" \
               | jq .
           else
@@ -56,6 +56,12 @@ jobs:
           fi
 
           for ID in $DEPLOY_IDS; do
+            echo "Marking GitHub deployment $ID as inactive"
+            gh api -X POST "repos/${{ github.repository }}/deployments/$ID/statuses" \
+              -f state=inactive -f description="PR closed, cleaning up" \
+              || true
+
             echo "Deleting GitHub deployment: $ID"
-            gh api -X DELETE "repos/${{ github.repository }}/deployments/$ID" || echo "Failed to delete deployment $ID"
+            gh api -X DELETE "repos/${{ github.repository }}/deployments/$ID" \
+              || echo "Failed to delete deployment $ID"
           done
