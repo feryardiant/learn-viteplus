@@ -68,6 +68,21 @@ Switched to `pull_request_target` + explicit `ref: head.sha` checkout. Same secu
 - Piped `while read` loops run in a subshell — variables set inside them don't persist. Use process substitution (`< <(command)`) instead
 - `$GITHUB_STEP_SUMMARY` for markdown workflow summaries
 
+### Workflow error annotations (in [`a999f12`](https://github.com/feryardiant/learn-viteplus/commit/a999f12c851328b05287851c8c7ddd85ab9dae1b))
+
+GitHub Actions supports `::error::` and `::warning::` annotations that show up inline on the workflow run page (not just in raw logs).
+
+```bash
+command || echo "::error ::Something went wrong"
+```
+
+Patterns applied:
+
+- **Critical failures** (`::error::`): API list/delete failures — stop the step with `exit 1`
+- **Non-critical failures** (`::warning::`): Mark status as inactive failure — log but continue
+- **`set -o pipefail`**: Ensures pipe failures (e.g. `curl | jq`) don't get silently lost
+- Replace bare `|| true` with `|| echo "::error::..."` so silence doesn't mask real errors
+
 ### Concurrency groups
 
 Per-branch concurrency keys (`cleanup-{branch}`, `Code-{branch}`) serialize runs for the same branch while allowing parallel runs across different branches.
