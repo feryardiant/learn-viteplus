@@ -11,7 +11,7 @@ on:
     types: [closed]
     branches: [main]
   schedule:
-    - cron: '0 17 * * 5' # Runs at 00:00, Saturday GMT+7
+    - cron: '0 17 * * 5' # Saturday 00:00 GMT+7
 
 concurrency:
   group: ${{ github.event_name == 'schedule' && 'cleanup-scheduled' || format('cleanup-{0}', github.event.pull_request.head.ref) }}
@@ -38,15 +38,25 @@ jobs:
       - name: Delete CF Pages preview
         id: cf-cleanup
         run: |
+          set -o pipefail
+
           echo "Delete Cloudflare preview deployments from merged PR..."
 
-          DEPLOY_ID=$(curl -s "$CF_ENDPOINT" -H "Authorization: Bearer $CF_API_TOKEN" \
-            | jq -r --arg BRANCH "$BRANCH" '.result[] | select(.deployment_trigger.metadata.branch == $BRANCH) | .id' \
-            | head -1)
+          RESPONSE=$(curl -s "$CF_ENDPOINT" -H "Authorization: Bearer $CF_API_TOKEN") || {
+            echo "::error ::CF API list failed for branch $BRANCH"
+            echo "found=false" >> $GITHUB_OUTPUT
+            exit 1
+          }
+
+          DEPLOY_ID=$(echo "$RESPONSE" | jq -r --arg BRANCH "$BRANCH" '.result[] | select(.deployment_trigger.metadata.branch == $BRANCH) | .id' | head -1)
 
           if [ -n "$DEPLOY_ID" ]; then
             echo "Deleting CF Pages deployment: $DEPLOY_ID"
-            curl -s -X DELETE "$CF_ENDPOINT/$DEPLOY_ID?force=true" -H "Authorization: Bearer $CF_API_TOKEN" | jq .
+            curl -s -X DELETE "$CF_ENDPOINT/$DEPLOY_ID?force=true" -H "Authorization: Bearer $CF_API_TOKEN" | jq . || {
+              echo "::error ::CF API delete failed for deployment $DEPLOY_ID"
+              echo "found=false" >> $GITHUB_OUTPUT
+              exit 1
+            }
             echo "found=true" >> $GITHUB_OUTPUT
           else
             echo "No CF Pages deployment found for branch: $BRANCH"
@@ -59,9 +69,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "Delete GitHub preview deployments from merged PR..."
-
-          DEPLOY_IDS=$(gh api "$GH_ENDPOINT?ref=$BRANCH&environment=preview" --jq '.[].id')
           COUNT=0
+
+          DEPLOY_IDS=$(gh api "$GH_ENDPOINT?ref=$BRANCH&environment=preview" --jq '.[].id') || {
+            echo "::error ::GitHub API list failed for branch $BRANCH"
+            echo "count=$COUNT" >> $GITHUB_OUTPUT
+            exit 1
+          }
 
           if [ -z "$DEPLOY_IDS" ]; then
             echo "No GitHub deployments found for branch: $BRANCH"
@@ -71,10 +85,12 @@ jobs:
 
           for ID in $DEPLOY_IDS; do
             echo "Marking GitHub deployment $ID as inactive"
-            gh api -X POST "$GH_ENDPOINT/$ID/statuses" -f state=inactive -f description="PR closed, cleaning up" || true
+            gh api -X POST "$GH_ENDPOINT/$ID/statuses" -f state=inactive -f description="PR closed, cleaning up" \
+              || echo "::warning ::Failed to mark deployment $ID as inactive"
 
             echo "Deleting GitHub deployment: $ID"
-            gh api -X DELETE "$GH_ENDPOINT/$ID" || echo "Failed to delete deployment $ID"
+            gh api -X DELETE "$GH_ENDPOINT/$ID" \
+              || echo "::error ::Failed to delete deployment $ID"
             COUNT=$((COUNT + 1))
           done
 
@@ -110,30 +126,47 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -o pipefail
+
           echo "Checking for stale preview deployments..."
           COUNT=0
+
+          RESPONSE=$(curl -s "$CF_ENDPOINT" -H "Authorization: Bearer $CF_API_TOKEN") || {
+            echo "::error ::CF API list failed"
+            echo "count=$COUNT" >> $GITHUB_OUTPUT
+            exit 1
+          }
 
           while read -r DEPLOY; do
             BRANCH=$(echo "$DEPLOY" | jq -r '.branch')
             DEPLOY_ID=$(echo "$DEPLOY" | jq -r '.id')
 
-            PR_COUNT=$(gh pr list --repo "${{ github.repository }}" --head "$BRANCH" --state open --json number --jq 'length')
+            PR_COUNT=$(gh pr list --repo "${{ github.repository }}" --head "$BRANCH" --state open --json number --jq 'length') || {
+              echo "::error ::gh pr list failed for branch $BRANCH"
+              continue
+            }
 
             if [ "$PR_COUNT" -eq 0 ]; then
               echo "No open PR for branch $BRANCH, cleaning up..."
 
-              curl -s -X DELETE "$CF_ENDPOINT/$DEPLOY_ID?force=true" -H "Authorization: Bearer $CF_API_TOKEN" | jq .
+              curl -s -X DELETE "$CF_ENDPOINT/$DEPLOY_ID?force=true" -H "Authorization: Bearer $CF_API_TOKEN" | jq . \
+                || echo "::error ::CF API delete failed for deployment $DEPLOY_ID ($BRANCH)"
 
-              GH_DEPLOY_IDS=$(gh api "$GH_ENDPOINT?ref=$BRANCH&environment=preview" --jq '.[].id')
+              GH_DEPLOY_IDS=$(gh api "$GH_ENDPOINT?ref=$BRANCH&environment=preview" --jq '.[].id') \
+                || echo "::error ::GitHub API list failed for branch $BRANCH"
+
               for GH_ID in $GH_DEPLOY_IDS; do
-                gh api -X POST "$GH_ENDPOINT/$GH_ID/statuses" -f state=inactive -f description="Stale, no open PR" || true
-                gh api -X DELETE "$GH_ENDPOINT/$GH_ID" || true
+                gh api -X POST "$GH_ENDPOINT/$GH_ID/statuses" -f state=inactive -f description="Stale, no open PR" \
+                  || echo "::warning ::Failed to mark deployment $GH_ID as inactive"
+                gh api -X DELETE "$GH_ENDPOINT/$GH_ID" \
+                  || echo "::error ::Failed to delete deployment $GH_ID"
               done
 
               COUNT=$((COUNT + 1))
             fi
-          done < <(curl -s "$CF_ENDPOINT" -H "Authorization: Bearer $CF_API_TOKEN" \
-            | jq -c '.result[] | select(.deployment_trigger.metadata.branch != "main") | {id, branch: .deployment_trigger.metadata.branch}')
+          done < <(echo "$RESPONSE" | jq -c '.result[] | select(.deployment_trigger.metadata.branch != "main") | {id, branch: .deployment_trigger.metadata.branch}') || {
+            echo "::error ::Failed to parse CF deployments"
+          }
 
           echo "count=$COUNT" >> $GITHUB_OUTPUT
 
@@ -144,7 +177,11 @@ jobs:
         run: |
           echo "Pruning old production deployments..."
 
-          DEPLOY_IDS=$(gh api "$GH_ENDPOINT?ref=main&environment=production" --jq '.[].id')
+          DEPLOY_IDS=$(gh api "$GH_ENDPOINT?ref=main&environment=production" --jq '.[].id') || {
+            echo "::error ::GitHub API list failed for production deployments"
+            echo "count=0" >> $GITHUB_OUTPUT
+            exit 1
+          }
 
           if [ -z "$DEPLOY_IDS" ]; then
             echo "No production deployments found"
@@ -156,9 +193,11 @@ jobs:
           OLD_COUNT=$((TOTAL - 1))
 
           if [ "$OLD_COUNT" -gt 0 ]; then
+            echo "Found $OLD_COUNT old production deployment(s) to mark inactive"
             echo "$DEPLOY_IDS" | tail -n +2 | while read -r ID; do
               echo "Marking production deployment $ID as inactive"
-              gh api -X POST "$GH_ENDPOINT/$ID/statuses" -f state=inactive -f description="Superseded by newer deployment" || true
+              gh api -X POST "$GH_ENDPOINT/$ID/statuses" -f state=inactive -f description="Superseded by newer deployment" \
+                || echo "::error ::Failed to mark production deployment $ID as inactive"
             done
           else
             echo "Only one production deployment exists, nothing to prune"
