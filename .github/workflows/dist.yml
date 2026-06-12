@@ -67,7 +67,7 @@ jobs:
 
     environment:
       name: ${{ needs.build.outputs.deploy-env }}
-      url: ${{ steps.deploy.outputs.deployment-url }}
+      url: ${{ steps.deploy.outputs.pages-deployment-alias-url || vars.BASE_URL }}
 
     permissions:
       contents: read
