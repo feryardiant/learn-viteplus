@@ -50,7 +50,7 @@ jobs:
             exit 1
           }
 
-          DEPLOY_IDS=$(echo "$RESPONSE" | jq -r '.result[] | select(.deployment_trigger.metadata.branch == $BRANCH) | .id') || {
+          DEPLOY_IDS=$(echo "$RESPONSE" | jq -r --arg BRANCH "$BRANCH" '.result[] | select(.deployment_trigger.metadata.branch == $BRANCH) | .id') || {
             echo "::error ::Failed to parse CF deployments for branch: $BRANCH"
             echo "count=$COUNT" >> $GITHUB_OUTPUT
             exit 1
