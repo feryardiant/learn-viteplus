@@ -1,29 +1,98 @@
-# Vite+ Monorepo Starter
+# learn-viteplus
 
-A starter for creating a Vite+ monorepo.
+Learning **Vite+** (monorepo tooling) and **Cloudflare** (Pages, Workers, edge compute) — all within free plan boundaries.
 
-## Development
+A Vue 3 web app + TypeScript library, managed as a Vite+ monorepo.
 
-- Check everything is ready:
+## Architecture
 
-```bash
-vp run ready
+| Package                  | Path              | Build                         |
+| ------------------------ | ----------------- | ----------------------------- |
+| `@feryardiant/lvp-web`   | `apps/website/`   | `vp build` → Cloudflare Pages |
+| `@feryardiant/lvp-utils` | `packages/utils/` | `vp pack` (tsdown) → `dist/`  |
+
+## CI/CD Pipeline
+
+All three workflows use `pull_request_target` to safely access secrets from fork PRs (unlike `pull_request` which doesn't provide secrets for forks).
+
+```
+PR opened/pushed ──► code.yml ──► dist.yml ──► Cloudflare Pages
+                        │              ▲
+                        │              │
+                        ▼              │
+                      lint      workflow_call
+                                    (reusable)
+
+PR closed ──► cleanup.yml ──► Delete CF + GitHub deployment records
+
+Saturday 00:00 GMT+7 ──► cleanup.yml (prune) ──► Stale previews + old production
 ```
 
-- Run the tests:
+| Workflow      | Event                                                       | What it does                                                              |
+| ------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `code.yml`    | `pull_request_target [opened, synchronize]` + `push [main]` | Lint, then call `dist.yml`                                                |
+| `dist.yml`    | `workflow_call` + `workflow_dispatch`                       | Build website, deploy to CF Pages                                         |
+| `cleanup.yml` | `pull_request_target [closed]` + `schedule`                 | Cleanup on PR close; weekly prune stale previews & old production deploys |
+
+## Key Learnings
+
+### `workflow_run` limitations
+
+Initial approach (in [`1ceb2bb`](https://github.com/feryardiant/learn-viteplus/commit/1ceb2bbde7575a013fc511943b4e595a9f65f1a1)) used `workflow_run` to chain workflows sequentially. Two problems (see [#5](https://github.com/feryardiant/learn-viteplus/issues/5)):
+
+- Downstream workflows don't show as PR checks (no PR context)
+- They run on the default branch (`main`), not the PR branch
+
+### `pull_request_target` for fork-safe secrets (in [`27f00b3`](https://github.com/feryardiant/learn-viteplus/commit/27f00b3024870a56cb5af1d577cb980811818516))
+
+Switched to `pull_request_target` + explicit `ref: head.sha` checkout. Same security model as `workflow_run` (workflow YAML from base repo, PR code at commit level) but with full PR visibility.
+
+**Tradeoff**: `pull_request_target` runs in the base repo context with secrets — same risk as `workflow_run`, you're trusting that you won't run malicious `run:` steps from the base branch's workflow file.
+
+### Reusable workflows with `workflow_call` (in [`27f00b3`](https://github.com/feryardiant/learn-viteplus/commit/27f00b3024870a56cb5af1d577cb980811818516))
+
+`dist.yml` is called from `code.yml` with `secrets: inherit`. Also supports `workflow_dispatch` for manual deployments. Branch is resolved via `${{ inputs.branch || github.ref_name }}` — input for `workflow_call`, selected branch for `dispatch`.
+
+### CF Pages API quirks (see [`27420860064`](https://github.com/feryardiant/learn-viteplus/actions/runs/27420860064) and [this comment](https://github.com/feryardiant/learn-viteplus/pull/4#issuecomment-4692087162))
+
+- Deleting an aliased deployment requires `?force=true`
+- Deployments are identified by **branch**, not PR number — creates a race if the same branch name is reused for a new PR before cleanup finishes
+
+### GitHub Deployments API (see [`27420860064`](https://github.com/feryardiant/learn-viteplus/actions/runs/27420860064) and [this comment](https://github.com/feryardiant/learn-viteplus/pull/4#issuecomment-4692087162))
+
+- Deployments must be marked `inactive` before they can be deleted
+- Production pruning: keep only the latest deployment, mark older ones as inactive (not deleted)
+
+### Bash gotchas in GitHub Actions (in [`9002824`](https://github.com/feryardiant/learn-viteplus/commit/900282498cf29291b34a30d3b5021535c54fb8ba))
+
+- Piped `while read` loops run in a subshell — variables set inside them don't persist. Use process substitution (`< <(command)`) instead
+- `$GITHUB_STEP_SUMMARY` for markdown workflow summaries
+
+### Concurrency groups
+
+Per-branch concurrency keys (`cleanup-{branch}`, `Code-{branch}`) serialize runs for the same branch while allowing parallel runs across different branches.
+
+## Future Direction
+
+- **Workers & Page Functions**: API routes, middleware, server-side logic
+- **KV**: Session stores, cache, config
+- **D1 / SQL DB**: Structured data storage
+- **All kept within Cloudflare's free plan**
+
+## Quick Commands
 
 ```bash
-vp run -r test
+vp install       # install deps (bun 1.3.14, node >=22.12)
+vp run dev       # start website dev server
+vp run ready     # check + test + build all workspaces
+vp check         # lint + typecheck (Oxlint + Oxfmt)
+vp check --fix   # auto-fix lint/format
+vp test          # run tests in current workspace
+vp run -r test   # run tests across all workspaces
+vp run -r build  # build all workspaces
+vp env doctor    # debug setup/runtime issues
 ```
 
-- Build the monorepo:
+## License
 
-```bash
-vp run -r build
-```
-
-- Run the development server:
-
-```bash
-vp run dev
-```
+MIT
