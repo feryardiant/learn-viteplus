@@ -54,9 +54,16 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 - Pre-commit hook auto-fixes staged files
 - `.gitignore` excludes `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md` — `AGENTS.md` is the allowed agent instruction file
 
+## Git commits
+
+- **Never commit unless explicitly asked**. Wait for "commit" or "commit please" from the user.
+- Use conventional commit format: `type: short description` (e.g., `ci:`, `feat:`, `fix:`)
+- Keep the subject line concise. Add a brief, informative body when there are multiple changes worth noting.
+- Commits should be atomic — one logical change per commit.
+
 ## CI/CD
 
-GitHub Actions chain: **Prepare** (label PRs) → **Code** (lint on `vp check`) → **Distribute** (build + deploy to Cloudflare Pages via wrangler). PRs must pass `vp check` before deploy.
+GitHub Actions chain: **Code** (lint on `vp check` via `pull_request_target`) → **Distribute** (build + deploy via `workflow_call`). PRs must pass `vp check` before deploy. **Cleanup** runs on PR close and weekly schedule to prune stale/orphan deployments.
 
 ## IDE
 
