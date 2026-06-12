@@ -57,6 +57,7 @@ Switched to `pull_request_target` + explicit `ref: head.sha` checkout. Same secu
 
 - Deleting an aliased deployment requires `?force=true`
 - Deployments are identified by **branch**, not PR number — creates a race if the same branch name is reused for a new PR before cleanup finishes
+- A PR can have **multiple** CF Pages deployments over its lifetime (new pushes, re-runs). Cleanup must loop over all matching deployments, not just the latest (`head -1`)
 
 ### GitHub Deployments API (see [`27420860064`](https://github.com/feryardiant/learn-viteplus/actions/runs/27420860064) and [this comment](https://github.com/feryardiant/learn-viteplus/pull/4#issuecomment-4692087162))
 
@@ -67,6 +68,28 @@ Switched to `pull_request_target` + explicit `ref: head.sha` checkout. Same secu
 
 - Piped `while read` loops run in a subshell — variables set inside them don't persist. Use process substitution (`< <(command)`) instead
 - `$GITHUB_STEP_SUMMARY` for markdown workflow summaries
+
+### Dead `||` after `done < <(...)` (in [`39fb9cb`](https://github.com/feryardiant/learn-viteplus/commit/39fb9cbe1d53e20e732d17ff023bc0e0f6ec0316))
+
+A `||` after `done < <(command)` never actually catches command failures:
+
+```bash
+# This does NOT catch jq failures:
+done < <(jq '...') || { echo "::error::..."; }
+
+# jq's exit code doesn't propagate through process substitution
+# Empty results make while exit 0 (not 1), so the handler is dead code
+```
+
+Correct pattern — capture output in a variable first, check the exit code:
+
+```bash
+DATA=$(jq '...') || {
+    echo "::error ::Failed to parse"
+    exit 1
+}
+while read -r ITEM; do ... done <<< "$DATA"
+```
 
 ### Workflow error annotations (in [`a999f12`](https://github.com/feryardiant/learn-viteplus/commit/a999f12c851328b05287851c8c7ddd85ab9dae1b))
 
