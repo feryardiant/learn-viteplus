@@ -1,29 +1,26 @@
 name: Code
-run-name: 'ci(${{ github.event.workflow_run.head_branch }}): quality check against `${{ github.event.workflow_run.head_sha }}`'
+run-name: 'ci(${{ github.event.pull_request.head.ref || github.ref_name }}): quality check'
 
 on:
-  workflow_run:
-    workflows: [Prepare]
-    types: [completed]
+  pull_request_target:
+    branches: [main]
+  push:
+    branches: [main]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
-
-env:
-  BUN_VERSION: ${{ vars.BUN_VERSION || '1.3.14' }}
 
 jobs:
   lint:
     name: Linting
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: Set up Vite+
@@ -37,3 +34,11 @@ jobs:
 
       - name: Lint
         run: vp check
+
+  distribute:
+    name: Distribute
+    needs: lint
+    uses: ./.github/workflows/dist.yml
+    with:
+      branch-name: ${{ github.event.pull_request.head.ref || github.ref_name }}
+    secrets: inherit
