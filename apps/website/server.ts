@@ -8,6 +8,10 @@ export default {
       return Response.json({ foo: 'Anu' })
     }
 
+    if (req.method !== 'GET' || !req.headers.get('Accept')?.includes('text/html')) {
+      return env.ASSETS.fetch(req)
+    }
+
     try {
       const appHtml = await render(url)
       const template = await env.ASSETS.fetch(new URL('/index.html', req.url)).then(async (res) => await res.text())
