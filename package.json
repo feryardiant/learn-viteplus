@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "vite-plus": "catalog:",
-    "wrangler": "^4.99.0"
+    "wrangler": "catalog:"
   },
   "overrides": {
     "vite": "catalog:",
@@ -38,6 +38,7 @@
     "typescript": "~6.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
     "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
-    "vite-plus": "latest"
+    "vite-plus": "latest",
+    "wrangler": "^4.99.0"
   }
 }
