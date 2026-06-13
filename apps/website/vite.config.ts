@@ -15,5 +15,13 @@ export default defineConfig({
     environment: 'jsdom',
     root: fileURLToPath(new URL('./', import.meta.url)),
   },
-  plugins: [process.env.VITEST ? undefined : cloudflare(), vue(), vueDevTools()].filter(Boolean),
+  plugins: [
+    process.env.VITEST
+      ? undefined
+      : cloudflare({
+          viteEnvironment: { name: 'ssr' },
+        }),
+    vue(),
+    vueDevTools(),
+  ].filter(Boolean),
 })

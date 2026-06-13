@@ -78,6 +78,12 @@ jobs:
         with:
           name: website
 
+      - name: Merge build outputs
+        run: |
+          mv dist dist.old && mkdir dist
+          cp -r dist.old/client/. dist/
+          cp -r dist.old/ssr/. dist/
+
       - name: Build & Deploy Worker
         id: deploy
         uses: cloudflare/wrangler-action@v3
