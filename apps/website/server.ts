@@ -1,40 +1,28 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-import { fileURLToPath, URL } from 'node:url'
+import { render } from './src/server'
 
-import { renderToString } from 'vue/server-renderer'
+export default {
+  async fetch(req, env) {
+    const url = new URL(req.url)
 
-import { createApp } from './src/app.ts'
+    if (url.pathname.startsWith('/api')) {
+      return Response.json({ foo: 'Anu' })
+    }
 
-const fetch: ExportedHandler['fetch'] = async (req) => {
-  const url = new URL(req.url)
+    try {
+      const appHtml = await render(url)
+      const template = await env.ASSETS.fetch(new URL('/index.html', req.url)).then(async (res) => await res.text())
 
-  if (url.pathname.startsWith('/api')) {
-    return Response.json({ foo: 'Anu' })
-  }
-
-  if (url.pathname.startsWith('/anu')) {
-    // const indexHtml = fileURLToPath(new URL('./index.html', import.meta.url))
-    let template = readFileSync(resolve(import.meta.dirname, 'index.html'), 'utf-8')
-
-    // const { createServer } = await import('vite-plus')
-    // const vite = await createServer({
-    //   appType: 'custom',
-    //   server: { middlewareMode: true },
-    // })
-
-    // template = await vite.transformIndexHtml(url.toString(), template)
-
-    // console.log(template)
-
-    // const { app } = createApp()
-    // const html = template.replace('<!--ssr-outlet-->', await renderToString(app))
-
-    return new Response(template, { status: 200 })
-    // return new Response(html, { status: 200 })
-  }
-
-  return new Response(null, { status: 404 })
-}
-
-export default { fetch } satisfies ExportedHandler
+      return new Response(template.replace('<!--ssr-outlet-->', appHtml), {
+        headers: { 'content-type': 'text/html' },
+      })
+    } catch (err) {
+      return new Response(
+        JSON.stringify({
+          error: err instanceof Error ? err.message : String(err),
+          stack: err instanceof Error ? err.stack : undefined,
+        }),
+        { status: 500, headers: { 'content-type': 'application/json' } },
+      )
+    }
+  },
+} satisfies ExportedHandler<Env>

@@ -58,7 +58,7 @@ jobs:
         with:
           overwrite: true
           name: website
-          path: apps/website/dist
+          path: apps/website
 
   deploy:
     name: Deploy
@@ -85,4 +85,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
-            pages deploy . --project-name=learn-viteplus --branch=${{ env.BRANCH_NAME }}
+            pages deploy dist --project-name=learn-viteplus --branch=${{ env.BRANCH_NAME }}

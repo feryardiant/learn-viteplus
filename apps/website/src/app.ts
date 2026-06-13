@@ -5,16 +5,16 @@ import { createMemoryHistory, createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
 import { routes } from './routes'
 
-export function createApp() {
+export function createApp(base?: string) {
   const app = createSSRApp(App)
 
   const router = createRouter({
-    history: typeof window === 'undefined' ? createMemoryHistory() : createWebHistory(import.meta.env.BASE_URL),
+    history: typeof window === 'undefined' ? createMemoryHistory(base) : createWebHistory(base),
     routes,
   })
 
   app.use(router)
   app.use(createPinia())
 
-  return app
+  return { app, router }
 }

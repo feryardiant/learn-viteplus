@@ -8,6 +8,6 @@
 
   "compilerOptions": {
     "lib": [],
-    "types": ["node"]
+    "types": ["node", "vite-plus/client"]
   }
 }
