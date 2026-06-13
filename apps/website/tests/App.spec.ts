@@ -2,10 +2,11 @@ import { mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { describe, it, expect } from 'vite-plus/test'
 
+import { createRouter } from '@/app'
 import App from '@/App.vue'
-import { router } from '@/router'
 
 const pinia = createPinia()
+const router = createRouter()
 
 describe('App', () => {
   it('mounts renders properly', () => {
