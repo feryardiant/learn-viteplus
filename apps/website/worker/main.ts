@@ -1,4 +1,4 @@
-import { render } from './src/server'
+import { render } from '../src/ssr.ts'
 
 export default {
   async fetch(req, env) {
