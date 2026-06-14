@@ -1,48 +1,54 @@
 # web
 
-This template should help get you started developing with Vue 3 in Vite.
+Vue 3 website with SSR via Cloudflare Pages Functions, styled with TailwindCSS v4.
 
-## Recommended IDE Setup
+## Tech stack
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Framework**: Vue 3 with Composition API + `<script setup>`
+- **Routing**: vue-router 5 (HashHistory in dev, WebHistory in prod)
+- **State**: Pinia (counter example)
+- **Rendering**: SSR via `@cloudflare/vite-plugin` (Cloudflare Pages Functions)
+- **Styling**: TailwindCSS v4 via `@tailwindcss/vite`
+- **Font**: Roboto Variable (`@fontsource-variable/roboto`)
+- **Testing**: Vitest + jsdom + `@vue/test-utils`
 
-## Recommended Browser Setup
+## CSS architecture
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+### Global styles (`src/style.css`)
 
-## Type Support for `.vue` Imports in TS
+- `@import 'tailwindcss'` — Tailwind base/components/utilities
+- `@theme` — Custom design tokens following TailwindCSS v4 naming conventions:
+  - `--font-sans`, `--font-mono`, `--font-heading`
+  - `--color-bg`, `--color-border`, `--color-text-muted`, `--color-text-heading`
+  - `--color-accent`, `--color-accent-bg`, `--color-accent-border`
+  - `--color-code-bg`, `--color-social-bg`, `--shadow-custom`
+- `@layer base` — Base element resets (`:root`, headings, paragraphs, `code`)
+- `#app` — Application shell layout (centered, bordered, full-height flex column)
+- `#center` — Shared route layout (centered flex column with gap)
+- `@variant dark` — Dark mode variable overrides
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### Component styles (`.vue` scoped blocks)
 
-## Customize configuration
+Each component owns its styling via `<style scoped>`:
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+| Component  | Scoped styles                                                   |
+| ---------- | --------------------------------------------------------------- |
+| `App.vue`  | `nav`, nav links, `router-link-exact-active`, `#spacer`         |
+| `Home.vue` | `.hero`, `#counter`, `.counter` buttons, `#next-steps`, `#docs` |
+| `Tick.vue` | Tick mark borders (unscoped, shared across routes)              |
 
-## Project Setup
+### Variable migration
 
-```sh
-bun install
-```
+The project migrated from standalone CSS custom properties to TailwindCSS v4 `@theme` tokens:
 
-### Compile and Hot-Reload for Development
-
-```sh
-bun dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-bun run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-bun test:unit
-```
+| Legacy      | TailwindCSS v4         |
+| ----------- | ---------------------- |
+| `--text`    | `--color-text-muted`   |
+| `--text-h`  | `--color-text-heading` |
+| `--bg`      | `--color-bg`           |
+| `--border`  | `--color-border`       |
+| `--code-bg` | `--color-code-bg`      |
+| `--accent`  | `--color-accent`       |
+| `--shadow`  | `--shadow-custom`      |
+| `--sans`    | `--font-sans`          |
+| `--mono`    | `--font-mono`          |
