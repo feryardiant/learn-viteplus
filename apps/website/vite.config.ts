@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { cloudflare } from '@cloudflare/vite-plugin'
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { defineConfig } from 'vite-plus'
@@ -22,6 +23,7 @@ export default defineConfig({
           viteEnvironment: { name: 'ssr' },
         }),
     vue(),
+    tailwindcss(),
     vueDevTools(),
   ].filter(Boolean),
 })

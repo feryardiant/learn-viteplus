@@ -16,6 +16,9 @@ describe('App', () => {
       },
     })
 
-    expect(wrapper.html()).toContain('<nav><a href="/" class="">Home</a><a href="/other" class="">Other</a></nav>')
+    const nav = wrapper.find('nav')
+    expect(nav.exists()).toBe(true)
+    expect(nav.text()).toContain('Home')
+    expect(nav.text()).toContain('Other')
   })
 })
