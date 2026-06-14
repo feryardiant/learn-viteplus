@@ -84,6 +84,7 @@ jobs:
           cp -r dist.old/ssr/. dist/
           cp -r dist.old/client/. dist/
           mv dist/index.js dist/_worker.js
+          ls -lah dist/
 
       - name: Build & Deploy Worker
         id: deploy
