@@ -49,6 +49,30 @@ Switched to `pull_request_target` + explicit `ref: head.sha` checkout. Same secu
 
 **Tradeoff**: `pull_request_target` runs in the base repo context with secrets — same risk as `workflow_run`, you're trusting that you won't run malicious `run:` steps from the base branch's workflow file.
 
+### `pull_request_target` workflow resolution (in [`03ca80a`](https://github.com/feryardiant/learn-viteplus/commit/03ca80ae58717cf0be67c21a30eb7e330985be95))
+
+`pull_request_target` always resolves workflow files from the **base branch** (`main`), not the PR branch. This means changes to `dist.yml` (or `code.yml`) on a feature branch are invisible to the CI until merged.
+
+```yaml
+# code.yml on main triggers for PR events
+on: pull_request_target
+
+jobs:
+  distribute:
+    uses: ./.github/workflows/dist.yml # always resolves from main
+```
+
+Unlike reusable workflows from external repos (which support `@ref` pinning), local workflows have no versioning mechanism.
+
+**Workaround for testing during development**: temporarily switch the trigger from `pull_request_target` to `pull_request`. When both the PR and base branch are within the same repository (not a fork), secrets are still available. This lets the CI pick up workflow changes from the feature branch for testing.
+
+```diff
+- on: pull_request_target
++ on: pull_request
+```
+
+Revert to `pull_request_target` before merging to maintain fork-safe behavior.
+
 ### Reusable workflows with `workflow_call` (in [`27f00b3`](https://github.com/feryardiant/learn-viteplus/commit/27f00b3024870a56cb5af1d577cb980811818516))
 
 `dist.yml` is called from `code.yml` with `secrets: inherit`. Also supports `workflow_dispatch` for manual deployments. Branch is resolved via `${{ inputs.branch || github.ref_name }}` — input for `workflow_call`, selected branch for `dispatch`.
