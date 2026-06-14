@@ -33,9 +33,6 @@
   "languages": {
     "CSS": {
       "language_servers": ["tailwindcss-intellisense-css", "!vscode-css-language-server"]
-    },
-    "Vue": {
-      "language_servers": ["tailwindcss-intellisense-css", "vue-language-server"]
     }
   }
 }

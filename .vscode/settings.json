@@ -12,9 +12,6 @@
   "oxc.fmt.configPath": "./vite.config.ts",
   "oxc.typeAware": true,
   "oxc.unusedDisableDirectives": "deny",
-  "tailwindCSS.includeLanguages": {
-    "vue": "html"
-  },
   "yaml.format.singleQuote": true,
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
