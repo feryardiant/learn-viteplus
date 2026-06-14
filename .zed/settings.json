@@ -2,6 +2,14 @@
   "code_actions_on_format": {
     "source.fixAll.oxc": true
   },
+  "format_on_save": "on",
+  "formatter": [
+    {
+      "language_server": {
+        "name": "oxfmt"
+      }
+    }
+  ],
   "lsp": {
     "oxlint": {
       "initialization_options": {
@@ -22,12 +30,9 @@
       }
     }
   },
-  "format_on_save": "on",
-  "formatter": [
-    {
-      "language_server": {
-        "name": "oxfmt"
-      }
+  "languages": {
+    "CSS": {
+      "language_servers": ["tailwindcss-intellisense-css", "!vscode-css-language-server"]
     }
-  ]
+  }
 }

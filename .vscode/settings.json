@@ -5,6 +5,9 @@
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
   "editor.defaultFormatter": "oxc.oxc-vscode",
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
   "npm.scriptRunner": "vp",
   "oxc.fmt.configPath": "./vite.config.ts",
   "oxc.typeAware": true,
