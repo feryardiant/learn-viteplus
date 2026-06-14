@@ -83,6 +83,7 @@ jobs:
           mv dist dist.old && mkdir dist
           cp -r dist.old/ssr/. dist/
           cp -r dist.old/client/. dist/
+          mv dist/index.js dist/_worker.js
 
       - name: Build & Deploy Worker
         id: deploy
