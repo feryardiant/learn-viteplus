@@ -1,14 +1,9 @@
-import { createPinia } from 'pinia'
-import { createApp } from 'vue'
-
-import App from './App.vue'
-import { router } from './router'
+import { createApp } from './app'
 
 import './style.css'
 
-const app = createApp(App)
+const { app, router } = createApp(import.meta.env.BASE_URL)
 
-app.use(createPinia())
-app.use(router)
+await router.isReady()
 
 app.mount('#app')

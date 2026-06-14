@@ -41,6 +41,7 @@ GEMINI.md
 .env.*
 .env
 .tool-versions
+.wrangler
 node_modules
 
 # Node.js lock files

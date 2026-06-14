@@ -26,8 +26,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     outputs:
-      branch-name: ${{ steps.build.outputs.branch-name }}
-      deploy-env: ${{ steps.build.outputs.deploy-env }}
+      deploy-env: ${{ steps.install.outputs.deploy-env }}
 
     steps:
       - name: Checkout
@@ -43,22 +42,24 @@ jobs:
           cache: true
 
       - name: Install
-        run: vp install
-
-      - name: Build
-        id: build
+        id: install
         run: |
-          vp run -r build
+          vp install
 
           DEPLOY_ENV=$([[ "$BRANCH_NAME" == "main" ]] && echo "production" || echo "preview")
           echo "deploy-env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
 
+      - name: Build
+        run: |
+          vp run -r build -m ${{ steps.install.outputs.deploy-env }}
+
       - name: Store
         uses: actions/upload-artifact@v7
         with:
-          overwrite: true
-          name: website
+          name: website-${{ steps.install.outputs.deploy-env }}
           path: apps/website/dist
+          include-hidden-files: true
+          overwrite: true
 
   deploy:
     name: Deploy
@@ -76,7 +77,15 @@ jobs:
       - name: Prepare
         uses: actions/download-artifact@v8
         with:
-          name: website
+          name: website-${{ needs.build.outputs.deploy-env }}
+          path: to-deploy
+
+      - name: Merge build outputs
+        run: |
+          mv to-deploy/ssr dist
+          cp -r to-deploy/client/. dist/
+          mv dist/index.js dist/_worker.js
+          ls -lah dist/
 
       - name: Build & Deploy Worker
         id: deploy
@@ -85,4 +94,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
-            pages deploy . --project-name=learn-viteplus --branch=${{ env.BRANCH_NAME }}
+            pages deploy dist --project-name=learn-viteplus --branch=${{ env.BRANCH_NAME }}
