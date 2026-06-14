@@ -12,6 +12,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 
+env:
+  BRANCH_NAME: ${{ github.event.pull_request.head.ref || github.ref_name }}
+  COMMIT_REF: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   lint:
     name: Linting
@@ -21,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ env.COMMIT_REF }}
           persist-credentials: false
 
       - name: Set up Vite+
@@ -39,7 +43,7 @@ jobs:
   distribute:
     name: Distribute
     needs: lint
-    uses: ./.github/workflows/dist.yml
+    uses: ./.github/workflows/dist.yml@${{ env.COMMIT_REF }}
     with:
-      branch-name: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      branch-name: ${{ env.BRANCH_NAME }}
     secrets: inherit
