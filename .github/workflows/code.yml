@@ -2,7 +2,7 @@ name: Code
 run-name: 'ci(${{ github.event.pull_request.head.ref || github.ref_name }}): quality check'
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, synchronize]
   push:
