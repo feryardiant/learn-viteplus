@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.app.json",
+  "extends": "./tsconfig.node.json",
 
   // Override to include only test files and clear exclusions.
   // Application code imported in tests is automatically included via module resolution.

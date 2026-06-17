@@ -20,8 +20,7 @@
     "prepare": "vp config"
   },
   "devDependencies": {
-    "vite-plus": "catalog:",
-    "wrangler": "catalog:"
+    "vite-plus": "catalog:"
   },
   "overrides": {
     "vite": "catalog:",

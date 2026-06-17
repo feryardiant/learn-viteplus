@@ -6,7 +6,6 @@
       "name": "@feryardiant/learn-viteplus",
       "devDependencies": {
         "vite-plus": "catalog:",
-        "wrangler": "catalog:",
       },
     },
     "apps/website": {
