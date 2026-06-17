@@ -6,8 +6,8 @@
 
   "compilerOptions": {
     "lib": [],
-    "types": ["node", "vite-plus/client"]
-  },
+    "types": ["node", "vite-plus/client"],
 
-  "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.node.tsbuildinfo"
+    "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.node.tsbuildinfo"
+  }
 }
