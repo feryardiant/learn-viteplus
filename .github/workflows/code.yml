@@ -41,6 +41,7 @@ jobs:
   distribute:
     name: Distribute
     needs: lint
+    if: github.actor != 'dependabot[bot]'
     uses: ./.github/workflows/dist.yml
     with:
       branch-name: ${{ needs.lint.outputs.branch-name }}
