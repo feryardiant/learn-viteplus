@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.app.json",
 
-  "include": ["worker/*.d.ts", "worker/*.ts"],
+  "include": ["worker/*.d.ts", "worker/**/*.ts"],
   "exclude": [],
 
   "compilerOptions": {
@@ -9,5 +9,5 @@
     "types": ["node", "vite-plus/client"]
   },
 
-  "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.app.tsbuildinfo"
+  "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.node.tsbuildinfo"
 }

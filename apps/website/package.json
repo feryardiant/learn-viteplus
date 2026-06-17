@@ -15,7 +15,7 @@
   "scripts": {
     "dev": "vp dev",
     "build": "vp build",
-    "prepare": "wrangler types worker/env.d.ts",
+    "prepare": "wrangler types worker/wrangler.d.ts",
     "preview": "vp preview",
     "test": "vp test"
   },
