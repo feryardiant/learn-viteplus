@@ -20,6 +20,7 @@
     "test": "vp test"
   },
   "dependencies": {
+    "h3": "^2.0.1-rc.22",
     "pinia": "^3.0.4",
     "vue": "^3.5.38",
     "vue-router": "^5.0.4"
