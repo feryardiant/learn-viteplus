@@ -7,6 +7,8 @@ import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { defineConfig, loadEnv, UserConfig } from 'vite-plus'
 
+import pkg from './package.json' with { type: 'json' }
+
 export default defineConfig(({ mode }): UserConfig => {
   const env = loadEnv(mode, '.', '')
 
@@ -17,7 +19,8 @@ export default defineConfig(({ mode }): UserConfig => {
       },
     },
     test: {
-      include: ['tests/units/*.spec.ts', 'tests/integrations/*.spec.ts'],
+      name: `${pkg.name}:worker`,
+      include: ['tests/worker/*.spec.ts'],
       root: fileURLToPath(new URL('./', import.meta.url)),
       reporters: ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]],
       coverage: {

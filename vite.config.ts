@@ -1,5 +1,7 @@
 import { defineConfig, loadEnv, TestUserConfig, UserConfig } from 'vite-plus'
 
+import pkg from './package.json' with { type: 'json' }
+
 const reporters: TestUserConfig['reporters'] = ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]]
 
 export default defineConfig(({ mode }): UserConfig => {
@@ -17,9 +19,10 @@ export default defineConfig(({ mode }): UserConfig => {
       projects: [
         'apps/*',
         'packages/*',
+        'apps/website/vitest.app.config.ts',
         {
           test: {
-            name: 'e2e',
+            name: pkg.name,
             include: ['tests/e2e/*.spec.ts'],
             testTimeout: 60000,
             hookTimeout: 40000,

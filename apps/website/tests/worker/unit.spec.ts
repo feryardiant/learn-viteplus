@@ -2,9 +2,9 @@ import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test'
 import { env } from 'cloudflare:workers'
 import { describe, expect, it } from 'vite-plus/test'
 
-import worker from '../../worker/main'
+import worker from '../../worker/main.ts'
 
-describe('worker', () => {
+describe('unit', () => {
   it('response with json', async () => {
     const ctx = createExecutionContext()
     const req = new Request('http://localhost/api')
