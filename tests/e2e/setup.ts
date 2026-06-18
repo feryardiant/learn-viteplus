@@ -11,6 +11,8 @@ let browser: Browser | null = null
 
 export async function startServer(): Promise<void> {
   return new Promise((resolvePromise, reject) => {
+    let settled = false
+
     const proc = spawn('bunx', ['vp', 'dev'], {
       cwd: ROOT,
       stdio: 'pipe',
@@ -19,12 +21,16 @@ export async function startServer(): Promise<void> {
     server = proc
 
     const timeout = setTimeout(() => {
+      if (settled) return
+      settled = true
       reject(new Error('Dev server did not start within 30s'))
     }, 30000)
 
     const onData = (data: Buffer) => {
+      if (settled) return
       const text = data.toString()
       if (text.includes('localhost:') || text.includes('Ready') || text.includes('press')) {
+        settled = true
         clearTimeout(timeout)
         setTimeout(resolvePromise, 1000)
       }
@@ -34,8 +40,17 @@ export async function startServer(): Promise<void> {
     proc.stderr?.on('data', onData)
 
     proc.on('error', (err) => {
+      if (settled) return
+      settled = true
       clearTimeout(timeout)
       reject(err)
+    })
+
+    proc.on('exit', (code, signal) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timeout)
+      reject(new Error(`Dev server exited before readiness (code=${code}, signal=${signal})`))
     })
   })
 }

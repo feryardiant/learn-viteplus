@@ -20,7 +20,6 @@
     "prepare": "vp config"
   },
   "devDependencies": {
-    "@vitest/browser": "^4.1.9",
     "playwright": "^1.61.0",
     "vite-plus": "catalog:"
   },
@@ -40,8 +39,8 @@
     "tailwindcss": "~4.3.1",
     "typescript": "~6.0.2",
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
-    "vite-plus": "latest",
+    "vitest": "^4.1.9",
+    "vite-plus": "^0.2.1",
     "wrangler": "^4.99.0"
   }
 }
