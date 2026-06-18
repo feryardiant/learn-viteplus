@@ -3,14 +3,14 @@
 
   // Override to include only test files and clear exclusions.
   // Application code imported in tests is automatically included via module resolution.
-  "include": ["src/*.d.ts", "tests/**/*.ts", "worker/*.d.ts"],
+  "include": ["src/*.d.ts", "tests/**/*.ts"],
   "exclude": [],
 
   "compilerOptions": {
     // Vitest runs in a different environment than the application code.
     // Adjust lib and types accordingly.
     "lib": [],
-    "types": ["@cloudflare/vitest-pool-workers/types", "node", "jsdom"],
+    "types": ["@cloudflare/vitest-pool-workers/types", "node", "vite-plus/test/jsdom", "./worker/wrangler.d.ts"],
 
     // `vue-tsc --build` produces a .tsbuildinfo file for incremental type-checking.
     // Specified here to keep it out of the root directory.
