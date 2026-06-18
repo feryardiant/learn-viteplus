@@ -5,17 +5,7 @@ import { cloudflareTest } from '@cloudflare/vitest-pool-workers'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import { defineConfig, loadEnv, TestProjectConfiguration, UserConfig } from 'vite-plus'
-
-const projects: TestProjectConfiguration[] = [
-  {
-    test: {
-      name: 'unit',
-      include: ['tests/units/*.spec.ts'],
-      environment: 'jsdom',
-    },
-  },
-]
+import { defineConfig, loadEnv, UserConfig } from 'vite-plus'
 
 export default defineConfig(({ mode }): UserConfig => {
   const env = loadEnv(mode, '.', '')
@@ -27,10 +17,14 @@ export default defineConfig(({ mode }): UserConfig => {
       },
     },
     test: {
-      // environment: 'jsdom',
-      include: ['tests/units/*.spec.ts'],
+      include: ['tests/units/*.spec.ts', 'tests/integrations/*.spec.ts'],
       root: fileURLToPath(new URL('./', import.meta.url)),
-      // projects,
+      reporters: ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]],
+      coverage: {
+        provider: 'istanbul',
+        include: ['src/**', 'worker/**'],
+        reportsDirectory: 'tests/reports/coverage',
+      },
     },
     plugins: [
       env.VITEST

@@ -14,7 +14,18 @@ export default defineConfig(({ mode }): UserConfig => {
       '*': 'vp check --fix',
     },
     test: {
-      projects: ['apps/*', 'packages/*'],
+      projects: [
+        'apps/*',
+        'packages/*',
+        {
+          test: {
+            name: 'e2e',
+            include: ['tests/e2e/*.spec.ts'],
+            testTimeout: 60000,
+            hookTimeout: 40000,
+          },
+        },
+      ],
       coverage: {
         provider: 'istanbul',
         include: ['src/**', 'worker/**'],

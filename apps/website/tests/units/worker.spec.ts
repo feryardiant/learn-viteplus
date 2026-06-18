@@ -9,7 +9,7 @@ describe('worker', () => {
     const ctx = createExecutionContext()
     const req = new Request('http://localhost/api')
 
-    const res = await worker.fetch(req, env, ctx)
+    const res = await worker.fetch(req as Parameters<typeof worker.fetch>[0], env, ctx)
 
     await waitOnExecutionContext(ctx)
 
