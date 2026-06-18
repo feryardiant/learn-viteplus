@@ -1,4 +1,3 @@
-import { env } from 'cloudflare:workers'
 import { H3, html } from 'h3/cloudflare'
 
 import { render } from '../src/ssr.ts'
@@ -6,7 +5,7 @@ import { apiRoutes } from './routes'
 
 const app = new H3({
   onError(error, { res }) {
-    res.status = error.status || 500
+    res.status = error.status
 
     return {
       message: error.message,
@@ -15,7 +14,7 @@ const app = new H3({
   },
 })
 
-app.use(({ req }, next) => {
+app.use(({ context: { env }, req }, next) => {
   if (!req.headers.get('accept')?.includes('text/html')) {
     return env.ASSETS.fetch(new URL(req.url), req)
   }
