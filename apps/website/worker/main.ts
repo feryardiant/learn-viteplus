@@ -15,8 +15,10 @@ const app = new H3({
 })
 
 app.use(({ context: { env }, req }, next) => {
-  if (!req.headers.get('accept')?.includes('text/html')) {
-    return env.ASSETS.fetch(new URL(req.url), req)
+  const url = new URL(req.url)
+
+  if (!url.pathname.startsWith('/api') && !req.headers.get('accept')?.includes('text/html')) {
+    return env.ASSETS.fetch(url, req)
   }
 
   return next()

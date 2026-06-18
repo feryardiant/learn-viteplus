@@ -5,7 +5,7 @@ import { createApp } from './app.ts'
 export async function render(url: URL, context?: SSRContext) {
   const { app, router } = createApp()
 
-  await router.push(url.pathname)
+  await router.push(`${url.pathname}${url.search}${url.hash}`)
   await router.isReady()
 
   const html = await renderToString(app, context)
