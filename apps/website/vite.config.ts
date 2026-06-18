@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import { cloudflare } from '@cloudflare/vite-plugin'
+import { cloudflareTest } from '@cloudflare/vitest-pool-workers'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -18,7 +19,9 @@ export default defineConfig({
   },
   plugins: [
     process.env.VITEST
-      ? undefined
+      ? cloudflareTest({
+          wrangler: { configPath: './wrangler.jsonc' },
+        })
       : cloudflare({
           viteEnvironment: { name: 'ssr' },
         }),

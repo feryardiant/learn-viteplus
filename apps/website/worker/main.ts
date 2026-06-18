@@ -39,6 +39,6 @@ app.get('/**', async ({ context: { env }, req }) => {
 
 export default {
   async fetch(req, env, context) {
-    return app.request(req.url, req, { context, env })
+    return await app.request(req.url, req, { context, env })
   },
 } satisfies ExportedHandler<Env>
