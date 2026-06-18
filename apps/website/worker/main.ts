@@ -25,12 +25,12 @@ app.use(({ req }, next) => {
 
 app.mount('/api', apiRoutes)
 
-app.get('/**', async ({ req }) => {
+app.get('/**', async ({ context: { env }, req }) => {
   const body = await env.ASSETS.fetch(new URL('/index.html', req.url)).then(async (res) => {
     const template = await res.text()
-    const appHtml = await render(new URL(req.url))
+    const { html } = await render(new URL(req.url), { env, req })
 
-    return template.replace('<!--ssr-outlet-->', appHtml)
+    return template.replace('<!--ssr-outlet-->', html)
   })
 
   return html(body)
