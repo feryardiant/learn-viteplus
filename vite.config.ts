@@ -1,34 +1,53 @@
-import { defineConfig } from 'vite-plus'
+import { defineConfig, loadEnv, TestUserConfig, UserConfig } from 'vite-plus'
 
-export default defineConfig({
-  staged: {
-    '*': 'vp check --fix',
-  },
-  fmt: {
-    printWidth: 120,
-    singleQuote: true,
-    semi: false,
-    sortImports: true,
-  },
-  lint: {
-    jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
-    rules: {
-      'vite-plus/prefer-vite-plus-imports': 'error',
-      'no-console': ['error', { allow: ['warn', 'error'] }],
+const reporters: TestUserConfig['reporters'] = ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]]
+
+export default defineConfig(({ mode }): UserConfig => {
+  const env = loadEnv(mode, '.', '')
+
+  if (env.GITHUB_ACTIONS === 'true') {
+    reporters.push('github-actions')
+  }
+
+  return {
+    staged: {
+      '*': 'vp check --fix',
     },
-    options: { typeAware: true, typeCheck: true },
-    overrides: [
-      {
-        files: ['**/*.test.ts', '**/*.spec.ts'],
-        plugins: ['typescript', 'vitest'],
-        rules: {
-          '@typescript-eslint/no-explicit-any': 'off',
-          'vitest/no-disabled-tests': 'error',
-        },
+    test: {
+      projects: ['apps/*', 'packages/*'],
+      coverage: {
+        provider: 'istanbul',
+        include: ['src/**', 'worker/**'],
+        reportsDirectory: 'tests/reports/coverage',
       },
-    ],
-  },
-  run: {
-    cache: true,
-  },
+      reporters,
+    },
+    fmt: {
+      printWidth: 120,
+      singleQuote: true,
+      semi: false,
+      sortImports: true,
+    },
+    lint: {
+      jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
+      rules: {
+        'vite-plus/prefer-vite-plus-imports': 'error',
+        'no-console': ['error', { allow: ['warn', 'error'] }],
+      },
+      options: { typeAware: true, typeCheck: true },
+      overrides: [
+        {
+          files: ['**/*.test.ts', '**/*.spec.ts'],
+          plugins: ['typescript', 'vitest'],
+          rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
+            'vitest/no-disabled-tests': 'error',
+          },
+        },
+      ],
+    },
+    run: {
+      cache: true,
+    },
+  }
 })
