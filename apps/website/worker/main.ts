@@ -37,7 +37,7 @@ app.get('/**', async ({ req }) => {
 })
 
 export default {
-  async fetch(req, env, ctx) {
-    return app.request(req, {}, { cloudflare: { ctx, env } })
+  async fetch(req, env, context) {
+    return app.request(req.url, req, { context, env })
   },
 } satisfies ExportedHandler<Env>
