@@ -2,6 +2,7 @@ import { env } from 'cloudflare:workers'
 import { H3, html } from 'h3/cloudflare'
 
 import { render } from '../src/ssr.ts'
+import { apiRoutes } from './routes'
 
 const app = new H3({
   onError(error, { res }) {
@@ -21,6 +22,8 @@ app.use(({ req }, next) => {
 
   return next()
 })
+
+app.mount('/api', apiRoutes)
 
 app.get('/**', async ({ req }) => {
   const body = await env.ASSETS.fetch(new URL('/index.html', req.url)).then(async (res) => {
