@@ -17,6 +17,7 @@ async function startServer(): Promise<void> {
       cwd: ROOT,
       stdio: 'pipe',
       env: { ...process.env, NODE_ENV: 'development' },
+      detached: true,
     })
 
     server = proc
@@ -71,11 +72,50 @@ async function startServer(): Promise<void> {
   })
 }
 
-function stopServer(): void {
-  if (server) {
-    server.kill('SIGTERM')
+function stopServer(): Promise<void> {
+  return new Promise((resolve) => {
+    if (!server) {
+      resolve()
+      return
+    }
+
+    const proc = server
     server = null
-  }
+
+    if (proc.pid == null) {
+      resolve()
+      return
+    }
+
+    const gid = -proc.pid
+
+    const forceKill = () => {
+      try {
+        process.kill(gid, 'SIGKILL')
+      } finally {
+        resolve()
+      }
+    }
+
+    const timeout = setTimeout(forceKill, 5000)
+
+    proc.on('exit', () => {
+      clearTimeout(timeout)
+      resolve()
+    })
+
+    proc.on('error', () => {
+      clearTimeout(timeout)
+      resolve()
+    })
+
+    try {
+      process.kill(gid, 'SIGTERM')
+    } finally {
+      clearTimeout(timeout)
+      resolve()
+    }
+  })
 }
 
 export async function setup(project: TestProject) {
@@ -85,5 +125,5 @@ export async function setup(project: TestProject) {
 }
 
 export async function teardown() {
-  stopServer()
+  await stopServer()
 }
