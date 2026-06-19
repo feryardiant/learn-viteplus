@@ -34,10 +34,13 @@ async function startServer(): Promise<string> {
       reject(new Error('Dev server did not start within 30s'))
     }, 30000)
 
+    let output = ''
+
     const onData = (data: Buffer) => {
       if (settled) return
-      const text = data.toString()
-      const match = text.match(/Local:\s+http:\/\/localhost:(\d+)/)
+      output += data.toString()
+
+      const match = output.match(/Local:\s+http:\/\/localhost:(\d+)/)
 
       if (match) {
         devUrl = `http://localhost:${match[1]}`
@@ -50,8 +53,11 @@ async function startServer(): Promise<string> {
         return
       }
 
-      if (text.toLowerCase().startsWith('error:')) {
-        errorMessage = text.replace(/^error: /, '')
+      if (output.toLowerCase().includes('error:')) {
+        const errorMatch = output.match(/error:\s*(.+)/i)
+        if (errorMatch) {
+          errorMessage = errorMatch[1]
+        }
       }
     }
 
