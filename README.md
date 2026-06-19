@@ -15,22 +15,32 @@ A Vue 3 web app + TypeScript library, managed as a Vite+ monorepo.
 
 All three workflows use `pull_request_target` to safely access secrets from fork PRs (unlike `pull_request` which doesn't provide secrets for forks).
 
-```
-PR opened/pushed ──► code.yml ──► dist.yml ──► Cloudflare Pages
-                        │              ▲
-                        │              │
-                        ▼              │
-                      lint      workflow_call
-                                    (reusable)
+```mermaid
+flowchart TD
+  PR[PR opened/pushed] --> code
 
-PR closed ──► cleanup.yml ──► Delete CF + GitHub deployment records
+  subgraph code[code.yml]
+    direction TD
+    lint --> func["functional"]
+    func --> e2e["end-to-end"]
+    e2e --> dist
+  end
 
-Saturday 00:00 GMT+7 ──► cleanup.yml (prune) ──► Stale previews + old production
+  subgraph dist["dist.yml: workflow_call"]
+    build --> deploy
+  end
+
+  PRClosed[PR closed] --> cleanup
+  Schedule["Saturday 00:00 GMT+7"] --> cleanup
+
+  subgraph cleanup[cleanup.yml]
+    prune["Prun CF + GitHub deployment records"]
+  end
 ```
 
 | Workflow      | Event                                                       | What it does                                                              |
 | ------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `code.yml`    | `pull_request_target [opened, synchronize]` + `push [main]` | Lint, then call `dist.yml`                                                |
+| `code.yml`    | `pull_request_target [opened, synchronize]` + `push [main]` | Lint, functional tests (matrix), e2e tests, then call `dist.yml`          |
 | `dist.yml`    | `workflow_call` + `workflow_dispatch`                       | Build website, deploy to CF Pages                                         |
 | `cleanup.yml` | `pull_request_target [closed]` + `schedule`                 | Cleanup on PR close; weekly prune stale previews & old production deploys |
 
@@ -161,6 +171,79 @@ Two root causes:
 ```
 
 The CLI (`vp fmt`, `vp check --fix`) works correctly because at runtime Vite+ generates a resolved config file that oxfmt can consume directly.
+
+### ANSI escape codes break regex matching in piped output
+
+E2e test `globalSetup` spawns the dev server and waits for `Local: http://localhost:(\d+)` in stdout/stderr. CI failed with "Dev server did not start within 30s" despite the dev server starting successfully.
+
+**Root cause**: The Vite dev server outputs ANSI escape codes (colors, bold) that are interleaved within the matched text:
+
+```
+\033[1mLocal\033[22m:   \033[36mhttp://localhost:\033[1m5173\033[22m/
+```
+
+The regex `Local:\s+http:\/\/localhost:(\d+)` never matches because escape codes sit between `Local` and `:`, and inside `localhost:5173`.
+
+**Fix**: Strip ANSI codes from the accumulated buffer before matching:
+
+```ts
+const ansiPattern = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*[a-zA-Z]`, 'g')
+const stripAnsi = (str: string) => str.replace(ansiPattern, '')
+
+const clean = stripAnsi(output)
+const match = clean.match(/Local:\s+http:\/\/localhost:(\d+)/)
+```
+
+Note: Using `String.fromCharCode(27)` instead of `\x1B` or `\u001B` in the regex literal avoids the Oxlint `no-control-regex` warning.
+
+**Initial misdiagnosis**: First suspected buffered output splitting — the `onData` handler was checking each individual `data` chunk against the regex. If the "Local:" line was split across chunks, the regex would fail. Accumulating into a buffer was still the right fix, but the actual culprit was ANSI codes, not splitting.
+
+### Process cleanup on error detection
+
+When the dev server outputs an error message (detected via `error:` prefix in output), the original code set `settled = true` but left the process running and the timeout active. The process would eventually exit or the timeout would fire, but the error was silently swallowed.
+
+**Better approach**: Kill the process and let the `exit` handler do the cleanup. The error message is already captured, so the exit handler rejects with the correct message:
+
+```ts
+if (errorMatch) {
+  errorMessage = errorMatch[1]
+  // Kill the process — exit handler will clear timeout and reject
+  if (typeof proc.pid === 'number') {
+    try {
+      process.kill(-proc.pid, 'SIGTERM')
+    } catch {}
+  }
+}
+```
+
+### `kill ESRCH` in process teardown
+
+When stopping the dev server, `forceKill` sends `SIGKILL` to the process group after a 5-second fallback timeout. If the process already exited (e.g., crashed or was killed by the earlier `SIGTERM`), `process.kill()` throws `ESRCH` ("No such process").
+
+This is harmless — the `finally` block (or `catch {}`) ensures the promise resolves. But the original `try/finally` pattern surfaced the error in logs. Swapping to `try/catch {}` + unconditional `resolve()` produces the same behavior without noise.
+
+### Functional testing in monorepo CI
+
+When unit and integration tests run together per workspace package, the umbrella term is **functional testing** — as opposed to **e2e testing** which exercises full user-facing flows via Playwright.
+
+The CI pipeline separates these:
+
+| Job          | Scope                                                              |
+| ------------ | ------------------------------------------------------------------ |
+| `lint`       | `vp check` — runs once                                             |
+| `functional` | `vp run ${{ matrix.pkg }}#test` — matrix, parallel                 |
+| `end-to-end` | `vp test --project @feryardiant/learn-viteplus` — Playwright smoke |
+
+### Resolving workspace package paths in CI
+
+For monorepo CI jobs that need a package's directory (e.g., for Codecov coverage upload), resolve it dynamically from `package.json` names instead of hardcoding:
+
+```bash
+PKG_PATH=$(find apps packages -name "package.json" -not -path "*/node_modules/*" \
+  -exec jq -r "select(.name == \"${{ matrix.pkg }}\") | input_filename | split(\"/\")[0:-1] | join(\"/\")" {} \;)
+```
+
+This avoids duplication and keeps the matrix portable — adding a new package only requires adding its name to the matrix list.
 
 ## Future Direction
 
