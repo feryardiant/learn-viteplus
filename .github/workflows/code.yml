@@ -106,7 +106,7 @@ jobs:
 
       - name: Get playwright version
         id: playwright
-        run: echo "version=$(vp info playwright --json | jq -r '.version')" >> $GITHUB_ENV
+        run: echo "version=$(vp info playwright --json | jq -r '.version')" >> $GITHUB_OUTPUT
 
       - name: Set up playwright cache
         uses: actions/cache@v5
