@@ -1,4 +1,7 @@
+import { codecovVitePlugin } from '@codecov/vite-plugin'
 import { defineConfig, loadEnv, type TestUserConfig, type UserConfig } from 'vite-plus'
+
+import pkg from './package.json' with { type: 'json' }
 
 export default defineConfig(({ mode }): UserConfig => {
   const env = loadEnv(mode, '.', '')
@@ -25,5 +28,12 @@ export default defineConfig(({ mode }): UserConfig => {
         reportsDirectory: 'tests/reports/coverage',
       },
     },
+    plugins: [
+      codecovVitePlugin({
+        enableBundleAnalysis: 'CODECOV_TOKEN' in env && env.CODECOV_TOKEN !== '',
+        bundleName: pkg.name,
+        uploadToken: env.CODECOV_TOKEN,
+      }),
+    ],
   }
 })

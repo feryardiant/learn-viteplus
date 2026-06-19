@@ -12,6 +12,8 @@ on:
         required: true
       CLOUDFLARE_ACCOUNT_ID:
         required: true
+      CODECOV_TOKEN:
+        required: true
   workflow_dispatch:
 
 concurrency:
@@ -46,6 +48,7 @@ jobs:
         id: build
         env:
           DEPLOY_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
           vp run -r build -m $DEPLOY_ENV
 

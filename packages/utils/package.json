@@ -30,6 +30,7 @@
     "prepublishOnly": "vp run build"
   },
   "devDependencies": {
+    "@codecov/vite-plugin": "catalog:",
     "@types/node": "catalog:",
     "@typescript/native-preview": "catalog:",
     "@vitest/coverage-istanbul": "catalog:",
