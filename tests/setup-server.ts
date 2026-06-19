@@ -36,11 +36,15 @@ async function startServer(): Promise<string> {
 
     let output = ''
 
+    const ansiPattern = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*[a-zA-Z]`, 'g')
+    const stripAnsi = (str: string) => str.replace(ansiPattern, '')
+
     const onData = (data: Buffer) => {
       if (settled) return
       output += data.toString()
 
-      const match = output.match(/Local:\s+http:\/\/localhost:(\d+)/)
+      const clean = stripAnsi(output)
+      const match = clean.match(/Local:\s+http:\/\/localhost:(\d+)/)
 
       if (match) {
         devUrl = `http://localhost:${match[1]}`
@@ -53,10 +57,12 @@ async function startServer(): Promise<string> {
         return
       }
 
-      if (output.toLowerCase().includes('error:')) {
-        const errorMatch = output.match(/error:\s*(.+)/i)
+      if (clean.toLowerCase().includes('error:')) {
+        const errorMatch = clean.match(/error:\s*(.+)/i)
+
         if (errorMatch) {
           errorMessage = errorMatch[1]
+          settled = true
         }
       }
     }
