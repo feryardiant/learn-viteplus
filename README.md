@@ -34,7 +34,7 @@ flowchart TD
   Schedule["Saturday 00:00 GMT+7"] --> cleanup
 
   subgraph cleanup[cleanup.yml]
-    prune["Prun CF + GitHub deployment records"]
+    prune["Prune CF + GitHub deployment records"]
   end
 ```
 
