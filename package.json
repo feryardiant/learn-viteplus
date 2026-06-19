@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
     "playwright": "^1.61.0",
     "vite-plus": "catalog:"
   },
@@ -36,6 +37,7 @@
     "@tailwindcss/vite": "~4.3.1",
     "@types/node": "~24.13.2",
     "@typescript/native-preview": "7.0.0-dev.20260611.2",
+    "@vitest/coverage-istanbul": "^4.1.9",
     "bumpp": "^11.1.0",
     "tailwindcss": "~4.3.1",
     "typescript": "~6.0.2",

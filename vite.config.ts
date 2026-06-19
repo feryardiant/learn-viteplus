@@ -2,10 +2,9 @@ import { defineConfig, loadEnv, TestUserConfig, UserConfig } from 'vite-plus'
 
 import pkg from './package.json' with { type: 'json' }
 
-const reporters: TestUserConfig['reporters'] = ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]]
-
 export default defineConfig(({ mode }): UserConfig => {
   const env = loadEnv(mode, '.', '')
+  const reporters: TestUserConfig['reporters'] = ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]]
 
   if (env.GITHUB_ACTIONS === 'true') {
     reporters.push('github-actions')
@@ -17,9 +16,8 @@ export default defineConfig(({ mode }): UserConfig => {
     },
     test: {
       projects: [
-        'apps/*',
+        'apps/website/vitest.*.config.ts',
         'packages/*',
-        'apps/website/vitest.app.config.ts',
         {
           test: {
             name: pkg.name,

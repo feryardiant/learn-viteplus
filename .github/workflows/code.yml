@@ -14,10 +14,8 @@ concurrency:
 
 jobs:
   lint:
-    name: Linting
+    name: Lint
     runs-on: ubuntu-latest
-    outputs:
-      branch-name: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
     steps:
       - name: Checkout
@@ -29,20 +27,105 @@ jobs:
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: 24
           cache: true
+          node-version: lts
+          run-install: true
 
-      - name: Install
-        run: vp install
-
-      - name: Lint
+      - name: Check
         run: vp check
+
+  functional:
+    name: Test `${{ matrix.pkg }}`
+    runs-on: ubuntu-latest
+    needs: lint
+
+    strategy:
+      fail-fast: false
+      matrix:
+        pkg: ['@feryardiant/lvp-utils', '@feryardiant/lvp-web']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+          node-version: lts
+          run-install: true
+
+      - name: Get package path
+        id: pkg
+        run: |
+          PKG_PATH=$(find apps packages -name "package.json" -not -path "*/node_modules/*" \
+            -exec jq -r "select(.name == \"${{ matrix.pkg }}\") | input_filename | split(\"/\")[0:-1] | join(\"/\")" {} \;)
+
+          echo "path=$PKG_PATH" >> $GITHUB_OUTPUT
+
+      - name: Test
+        run: vp run ${{ matrix.pkg }}#test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ${{ steps.pkg.outputs.path }}/tests/reports/coverage
+          flags: functionals
+          report_type: coverage
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ${{ steps.pkg.outputs.path }}/tests/reports
+          report_type: test_results
+
+  end-to-end:
+    name: End-to-end Test
+    runs-on: ubuntu-latest
+    needs: functional
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          cache: true
+          node-version: lts
+          run-install: true
+
+      - name: Get playwright version
+        id: playwright
+        run: echo "version=$(vp info playwright --json | jq -r '.version')" >> $GITHUB_OUTPUT
+
+      - name: Set up playwright cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright${{ steps.playwright.outputs.version }}-${{ hashFiles('**/bun.lock') }}
+          restore-keys: playwright${{ steps.playwright.outputs.version }}-
+
+      - name: Set up playwright
+        run: vpx playwright install --only-shell chromium
+
+      - name: Test
+        run: vp test --project @feryardiant/learn-viteplus
 
   distribute:
     name: Distribute
-    needs: lint
+    needs: end-to-end
     if: github.actor != 'dependabot[bot]'
     uses: ./.github/workflows/dist.yml
     with:
-      branch-name: ${{ needs.lint.outputs.branch-name }}
+      branch-name: ${{ github.event.pull_request.head.ref || github.ref_name }}
     secrets: inherit

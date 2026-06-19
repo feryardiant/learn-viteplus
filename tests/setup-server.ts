@@ -34,10 +34,17 @@ async function startServer(): Promise<string> {
       reject(new Error('Dev server did not start within 30s'))
     }, 30000)
 
+    let output = ''
+
+    const ansiPattern = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*[a-zA-Z]`, 'g')
+    const stripAnsi = (str: string) => str.replace(ansiPattern, '')
+
     const onData = (data: Buffer) => {
       if (settled) return
-      const text = data.toString()
-      const match = text.match(/Local:\s+http:\/\/localhost:(\d+)/)
+      output += data.toString()
+
+      const clean = stripAnsi(output)
+      const match = clean.match(/Local:\s+http:\/\/localhost:(\d+)/)
 
       if (match) {
         devUrl = `http://localhost:${match[1]}`
@@ -50,8 +57,16 @@ async function startServer(): Promise<string> {
         return
       }
 
-      if (text.toLowerCase().startsWith('error:')) {
-        errorMessage = text.replace(/^error: /, '')
+      if (clean.toLowerCase().includes('error:') && typeof proc.pid === 'number') {
+        const errorMatch = clean.match(/error:\s*(.+)/i)
+
+        if (errorMatch) {
+          errorMessage = errorMatch[1]
+
+          try {
+            process.kill(-proc.pid, 'SIGTERM')
+          } catch {}
+        }
       }
     }
 
@@ -82,7 +97,7 @@ async function startServer(): Promise<string> {
 
 function stopServer(): Promise<void> {
   return new Promise((resolve) => {
-    if (!server) {
+    if (!server || server.killed) {
       resolve()
       return
     }
@@ -100,9 +115,8 @@ function stopServer(): Promise<void> {
     const forceKill = () => {
       try {
         process.kill(gid, 'SIGKILL')
-      } finally {
-        resolve()
-      }
+      } catch {}
+      resolve()
     }
 
     const timeout = setTimeout(forceKill, 5000)

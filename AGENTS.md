@@ -41,6 +41,8 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 - Tests import from `vite-plus/test` (not `vitest` directly)
 - Website tests use `@vue/test-utils` + `jsdom` environment
 - Config lives in `apps/website/vite.config.ts` (`test.environment: 'jsdom'`)
+- E2e tests live in `tests/e2e/`, run via `vp test --project @feryardiant/learn-viteplus`
+- E2e uses Playwright (`chromium`) + a `globalSetup` (`tests/setup-server.ts`) that spawns the dev server
 
 ## Code style
 
