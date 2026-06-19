@@ -1,7 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
 
-import Home from './Home.vue'
-import Other from './Other.vue'
+import Home from './home.vue'
+import Other from './other.vue'
 
 export const routes: RouteRecordRaw[] = [
   {

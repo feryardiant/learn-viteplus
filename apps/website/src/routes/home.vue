@@ -2,8 +2,8 @@
 import heroImg from '@/assets/hero.png'
 import typescriptLogo from '@/assets/typescript.svg'
 import viteLogo from '@/assets/vite.svg'
-import Card, { type CardLinkProp } from '@/components/Card.vue'
-import Tick from '@/components/Tick.vue'
+import Card, { type CardLinkProp } from '@/components/card.vue'
+import Tick from '@/components/tick.vue'
 import { useCounterStore } from '@/stores/counter'
 
 const counter = useCounterStore()
