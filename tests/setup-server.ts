@@ -57,12 +57,15 @@ async function startServer(): Promise<string> {
         return
       }
 
-      if (clean.toLowerCase().includes('error:')) {
+      if (clean.toLowerCase().includes('error:') && typeof proc.pid === 'number') {
         const errorMatch = clean.match(/error:\s*(.+)/i)
 
         if (errorMatch) {
           errorMessage = errorMatch[1]
-          settled = true
+
+          try {
+            process.kill(-proc.pid, 'SIGTERM')
+          } catch {}
         }
       }
     }
