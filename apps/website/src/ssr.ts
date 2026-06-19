@@ -1,14 +1,14 @@
-import { renderToString } from 'vue/server-renderer'
+import { renderToString, type SSRContext } from 'vue/server-renderer'
 
 import { createApp } from './app.ts'
 
-export async function render(url: URL) {
+export async function render(url: URL, context?: SSRContext) {
   const { app, router } = createApp()
 
-  await router.push(url.pathname)
+  await router.push(`${url.pathname}${url.search}${url.hash}`)
   await router.isReady()
 
-  const appHtml = await renderToString(app)
+  const html = await renderToString(app, context)
 
-  return appHtml
+  return { html }
 }

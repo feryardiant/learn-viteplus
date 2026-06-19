@@ -43,6 +43,7 @@ GEMINI.md
 .tool-versions
 .wrangler
 node_modules
+reports
 
 # Node.js lock files
 .pnpm-store

@@ -1,32 +1,44 @@
+import { H3, html } from 'h3/cloudflare'
+
 import { render } from '../src/ssr.ts'
+import { apiRoutes } from './routes'
+
+const app = new H3({
+  onError(error, { res }) {
+    res.status = error.status
+
+    return {
+      message: error.message,
+      stack: error.stack?.split('\n'),
+    }
+  },
+})
+
+app.use(({ context: { env }, req }, next) => {
+  const url = new URL(req.url)
+
+  if (!url.pathname.startsWith('/api') && !req.headers.get('accept')?.includes('text/html')) {
+    return env.ASSETS.fetch(url, req)
+  }
+
+  return next()
+})
+
+app.mount('/api', apiRoutes)
+
+app.get('/**', async ({ context: { env }, req }) => {
+  const body = await env.ASSETS.fetch(new URL('/index.html', req.url)).then(async (res) => {
+    const template = await res.text()
+    const { html } = await render(new URL(req.url), { env, req })
+
+    return template.replace('<!--ssr-outlet-->', html)
+  })
+
+  return html(body)
+})
 
 export default {
-  async fetch(req, env) {
-    const url = new URL(req.url)
-
-    if (url.pathname.startsWith('/api')) {
-      return Response.json({ foo: 'Anu' })
-    }
-
-    if (req.method !== 'GET' || !req.headers.get('Accept')?.includes('text/html')) {
-      return env.ASSETS.fetch(req)
-    }
-
-    try {
-      const appHtml = await render(url)
-      const template = await env.ASSETS.fetch(new URL('/index.html', req.url)).then(async (res) => await res.text())
-
-      return new Response(template.replace('<!--ssr-outlet-->', appHtml), {
-        headers: { 'content-type': 'text/html' },
-      })
-    } catch (err) {
-      return new Response(
-        JSON.stringify({
-          error: err instanceof Error ? err.message : String(err),
-          stack: err instanceof Error ? err.stack : undefined,
-        }),
-        { status: 500, headers: { 'content-type': 'application/json' } },
-      )
-    }
+  async fetch(req, env, context) {
+    return await app.request(req.url, req, { context, env })
   },
 } satisfies ExportedHandler<Env>

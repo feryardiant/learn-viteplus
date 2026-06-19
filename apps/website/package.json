@@ -20,12 +20,14 @@
     "test": "vp test"
   },
   "dependencies": {
+    "h3": "^2.0.1-rc.22",
     "pinia": "^3.0.4",
     "vue": "^3.5.38",
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.40.2",
+    "@cloudflare/vitest-pool-workers": "^0.16.16",
     "@fontsource-variable/roboto": "^5.2.10",
     "@tailwindcss/vite": "catalog:",
     "@types/jsdom": "^28.0.1",

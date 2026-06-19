@@ -1,3 +1,5 @@
+<script setup lang="ts"></script>
+
 <template>
   <div class="ticks relative w-full"></div>
 </template>
