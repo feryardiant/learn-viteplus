@@ -4,6 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "allowImportingTsExtensions": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node", "vite-plus/client", "vite-plus/test", "./tests/env.d.ts"]
   }
 }
