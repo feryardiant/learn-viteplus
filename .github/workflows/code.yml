@@ -65,6 +65,20 @@ jobs:
       - name: Install
         run: vp install
 
+      - name: Get playwright version
+        id: playwright
+        run: echo "version=$(vp info playwright --json | jq -r '.version')" >> $GITHUB_ENV
+
+      - name: Set up playwright cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: pnpm-playwright${{ steps.playwright.outputs.version }}-${{ hashFiles('**/bun.lock') }}
+          restore-keys: pnpm-playwright${{ steps.playwright.outputs.version }}-
+
+      - name: Set up playwright
+        run: vpx playwright install --only-shell chromium
+
       - name: Test
         run: vp test --project @feryardiant/learn-viteplus
 
