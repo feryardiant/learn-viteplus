@@ -1,15 +1,14 @@
 import { spawn } from 'node:child_process'
 import { resolve } from 'node:path'
 
-import { chromium, type Browser, type Page } from 'playwright'
+import type { TestProject } from 'vite-plus/test/node'
 
 const ROOT = resolve(import.meta.dirname, '..')
 
 let server: ReturnType<typeof spawn> | null = null
-let browser: Browser | null = null
 let devUrl = 'http://localhost:5173'
 
-export async function startServer(): Promise<void> {
+async function startServer(): Promise<void> {
   return new Promise((resolvePromise, reject) => {
     let settled = false
     let errorMessage = ''
@@ -72,27 +71,19 @@ export async function startServer(): Promise<void> {
   })
 }
 
-export function stopServer(): void {
+function stopServer(): void {
   if (server) {
     server.kill('SIGTERM')
     server = null
   }
 }
 
-export async function createPage(): Promise<Page> {
-  if (!browser) {
-    browser = await chromium.launch({})
-  }
-  return await browser.newPage()
+export async function setup(project: TestProject) {
+  await startServer()
+
+  project.provide('devUrl', devUrl)
 }
 
-export async function closeBrowser(): Promise<void> {
-  if (browser) {
-    await browser.close()
-    browser = null
-  }
-}
-
-export function getDevUrl(path: string = ''): string {
-  return `${devUrl}${path}`
+export async function teardown() {
+  stopServer()
 }

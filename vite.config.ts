@@ -23,6 +23,7 @@ export default defineConfig(({ mode }): UserConfig => {
         {
           test: {
             name: pkg.name,
+            globalSetup: ['tests/setup-server.ts'],
             include: ['tests/e2e/*.spec.ts'],
             testTimeout: 60000,
             hookTimeout: 40000,
