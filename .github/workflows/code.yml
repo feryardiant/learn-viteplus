@@ -58,11 +58,32 @@ jobs:
           node-version: lts
           run-install: true
 
-      - name: Lint
-        run: vp check
+      - name: Get package path
+        id: pkg
+        run: |
+          PKG_PATH=$(find apps packages -name "package.json" -not -path "*/node_modules/*" \
+            -exec jq -r "select(.name == \"${{ matrix.pkg }}\") | input_filename | split(\"/\")[0:-1] | join(\"/\")" {} \;)
+
+          echo "path=$PKG_PATH" >> $GITHUB_OUTPUT
 
       - name: Test
         run: vp run ${{ matrix.pkg }}#test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ${{ steps.pkg.outputs.path }}/tests/reports/coverage
+          flags: functionals
+          report_type: coverage
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ${{ steps.pkg.outputs.path }}/tests/reports
+          report_type: test_results
 
   end-to-end:
     name: End-to-end Test
@@ -91,8 +112,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
-          key: pnpm-playwright${{ steps.playwright.outputs.version }}-${{ hashFiles('**/bun.lock') }}
-          restore-keys: pnpm-playwright${{ steps.playwright.outputs.version }}-
+          key: playwright${{ steps.playwright.outputs.version }}-${{ hashFiles('**/bun.lock') }}
+          restore-keys: playwright${{ steps.playwright.outputs.version }}-
 
       - name: Set up playwright
         run: vpx playwright install --only-shell chromium

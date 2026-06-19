@@ -1,0 +1,19 @@
+comment:
+  layout: header, diff, flags
+
+coverage:
+  status:
+    project:
+      website:
+        threshold: 10%
+        flags:
+          - functionals
+        paths:
+          - apps/website
+
+      utils:
+        threshold: 10%
+        flags:
+          - functionals
+        paths:
+          - packages/utils
