@@ -4,6 +4,7 @@
   "exclude": [],
   "compilerOptions": {
     "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
 
     "types": ["vite-plus/client"],
 

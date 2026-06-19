@@ -2,7 +2,7 @@ import { createPinia } from 'pinia'
 import { createSSRApp } from 'vue'
 import { createMemoryHistory, createRouter as createVueRouter, createWebHistory } from 'vue-router'
 
-import App from './App.vue'
+import App from './app.vue'
 import { routes } from './routes'
 
 export function createApp(base?: string) {

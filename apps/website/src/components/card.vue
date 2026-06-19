@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { LinkProp } from './ExternalLink.vue'
-import ExternalLink from './ExternalLink.vue'
+import type { LinkProp } from './external-link.vue'
+import ExternalLink from './external-link.vue'
 
 export interface CardLinkProp extends LinkProp {
   icon: string

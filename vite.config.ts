@@ -45,6 +45,7 @@ export default defineConfig(({ mode }): UserConfig => {
       rules: {
         'vite-plus/prefer-vite-plus-imports': 'error',
         'no-console': ['error', { allow: ['warn', 'error'] }],
+        'unicorn/filename-case': ['error', { case: 'kebabCase' }],
       },
       options: { typeAware: true, typeCheck: true },
       overrides: [

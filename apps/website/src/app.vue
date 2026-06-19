@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Tick from '@/components/Tick.vue'
+import Tick from '@/components/tick.vue'
 </script>
 
 <template>

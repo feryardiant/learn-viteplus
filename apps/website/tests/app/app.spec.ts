@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import { describe, it, expect } from 'vite-plus/test'
 
 import { createRouter } from '@/app'
-import App from '@/App.vue'
+import App from '@/app.vue'
 
 const pinia = createPinia()
 const router = createRouter()
