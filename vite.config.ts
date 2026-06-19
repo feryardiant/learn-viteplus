@@ -32,7 +32,6 @@ export default defineConfig(({ mode }): UserConfig => {
       ],
       coverage: {
         provider: 'istanbul',
-        include: ['src/**', 'worker/**'],
         reportsDirectory: 'tests/reports/coverage',
       },
       reporters,

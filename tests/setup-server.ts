@@ -1,22 +1,21 @@
 import { spawn } from 'node:child_process'
-import { resolve } from 'node:path'
+import { dirname } from 'node:path'
 
 import type { TestProject } from 'vite-plus/test/node'
 
-const ROOT = resolve(import.meta.dirname, '..')
-
 let server: ReturnType<typeof spawn> | null = null
-let devUrl = 'http://localhost:5173'
 
-async function startServer(): Promise<void> {
-  return new Promise((resolvePromise, reject) => {
+async function startServer(): Promise<string> {
+  let devUrl = 'http://localhost:5173'
+
+  return new Promise((resolve, reject) => {
     let settled = false
     let errorMessage = ''
 
     const proc = spawn('vp', ['run', '@feryardiant/lvp-web#dev'], {
-      cwd: ROOT,
+      cwd: dirname(import.meta.dirname),
       stdio: 'pipe',
-      env: { ...process.env, NODE_ENV: 'development' },
+      env: process.env,
       detached: true,
     })
 
@@ -45,7 +44,9 @@ async function startServer(): Promise<void> {
         settled = true
 
         clearTimeout(timeout)
-        setTimeout(resolvePromise, 1000)
+        setTimeout(() => {
+          resolve(devUrl)
+        }, 1000)
         return
       }
 
@@ -89,7 +90,7 @@ function stopServer(): Promise<void> {
     const proc = server
     server = null
 
-    if (proc.pid == null) {
+    if (!proc.pid) {
       resolve()
       return
     }
@@ -126,9 +127,9 @@ function stopServer(): Promise<void> {
 }
 
 export async function setup(project: TestProject) {
-  await startServer()
+  const url = await startServer()
 
-  project.provide('devUrl', devUrl)
+  project.provide('devUrl', url)
 }
 
 export async function teardown() {
