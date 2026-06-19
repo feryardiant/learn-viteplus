@@ -25,6 +25,13 @@ async function startServer(): Promise<void> {
     const timeout = setTimeout(() => {
       if (settled) return
       settled = true
+
+      if (typeof proc.pid === 'number') {
+        try {
+          process.kill(-proc.pid, 'SIGTERM')
+        } catch {}
+      }
+
       reject(new Error('Dev server did not start within 30s'))
     }, 30000)
 
@@ -111,7 +118,7 @@ function stopServer(): Promise<void> {
 
     try {
       process.kill(gid, 'SIGTERM')
-    } finally {
+    } catch {
       clearTimeout(timeout)
       resolve()
     }
