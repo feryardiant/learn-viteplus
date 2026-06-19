@@ -88,7 +88,7 @@ async function startServer(): Promise<string> {
 
 function stopServer(): Promise<void> {
   return new Promise((resolve) => {
-    if (!server) {
+    if (!server || server.killed) {
       resolve()
       return
     }
@@ -106,9 +106,8 @@ function stopServer(): Promise<void> {
     const forceKill = () => {
       try {
         process.kill(gid, 'SIGKILL')
-      } finally {
-        resolve()
-      }
+      } catch {}
+      resolve()
     }
 
     const timeout = setTimeout(forceKill, 5000)
