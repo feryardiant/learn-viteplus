@@ -4,16 +4,16 @@ import { resolve } from 'node:path'
 import { chromium, type Browser, type Page } from 'playwright'
 
 const ROOT = resolve(import.meta.dirname, '../..')
-const DEV_URL = 'http://localhost:5173'
 
 let server: ReturnType<typeof spawn> | null = null
 let browser: Browser | null = null
+let devUrl = 'http://localhost:5173'
 
 export async function startServer(): Promise<void> {
   return new Promise((resolvePromise, reject) => {
     let settled = false
 
-    const proc = spawn('bunx', ['vp', 'dev'], {
+    const proc = spawn('vp', ['run', '@feryardiant/lvp-web#dev'], {
       cwd: ROOT,
       stdio: 'pipe',
       env: { ...process.env, NODE_ENV: 'development' },
@@ -29,6 +29,12 @@ export async function startServer(): Promise<void> {
     const onData = (data: Buffer) => {
       if (settled) return
       const text = data.toString()
+
+      const match = text.match(/Local:\s+http:\/\/localhost:(\d+)/)
+      if (match) {
+        devUrl = `http://localhost:${match[1]}`
+      }
+
       if (text.includes('localhost:') || text.includes('Ready') || text.includes('press')) {
         settled = true
         clearTimeout(timeout)
@@ -64,7 +70,7 @@ export function stopServer(): void {
 
 export async function createPage(): Promise<Page> {
   if (!browser) {
-    browser = await chromium.launch({ headless: true })
+    browser = await chromium.launch({})
   }
   return await browser.newPage()
 }
@@ -76,4 +82,6 @@ export async function closeBrowser(): Promise<void> {
   }
 }
 
-export { DEV_URL }
+export function getDevUrl(path: string = ''): string {
+  return `${devUrl}${path}`
+}
