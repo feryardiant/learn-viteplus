@@ -13,11 +13,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Linting
+  test-pkg:
+    name: Test `${{ matrix.pkg }}`
     runs-on: ubuntu-latest
-    outputs:
-      branch-name: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        pkg: ['@feryardiant/lvp-utils', '@feryardiant/lvp-web']
 
     steps:
       - name: Checkout
@@ -38,11 +41,38 @@ jobs:
       - name: Lint
         run: vp check
 
+      - name: Test
+        run: vp run ${{ matrix.pkg }}#test
+
+  test-e2e:
+    name: End-to-end Test
+    runs-on: ubuntu-latest
+    needs: test-pkg
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Set up Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: 24
+          cache: true
+
+      - name: Install
+        run: vp install
+
+      - name: Test
+        run: vp test --project @feryardiant/learn-viteplus
+
   distribute:
     name: Distribute
-    needs: lint
+    needs: test-e2e
     if: github.actor != 'dependabot[bot]'
     uses: ./.github/workflows/dist.yml
     with:
-      branch-name: ${{ needs.lint.outputs.branch-name }}
+      branch-name: ${{ github.event.pull_request.head.ref || github.ref_name }}
     secrets: inherit
