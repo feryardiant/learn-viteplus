@@ -19,6 +19,7 @@ export default defineConfig(({ mode }): UserConfig => {
       include: ['tests/units/*.spec.ts', 'tests/integrations/*.spec.ts'],
       reporters,
       coverage: {
+        enabled: 'GITHUB_ACTIONS' in env,
         provider: 'istanbul',
         include: ['src/**'],
         reportsDirectory: 'tests/reports/coverage',

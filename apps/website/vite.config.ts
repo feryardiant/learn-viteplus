@@ -24,6 +24,7 @@ export default defineConfig(({ mode }): UserConfig => {
       projects: ['vitest.*.config.ts'],
       reporters,
       coverage: {
+        enabled: 'GITHUB_ACTIONS' in env,
         provider: 'istanbul',
         include: ['src/**', 'worker/**'],
         reportsDirectory: 'tests/reports/coverage',
