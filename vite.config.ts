@@ -50,6 +50,12 @@ export default defineConfig(({ mode }): UserConfig => {
       options: { typeAware: true, typeCheck: true },
       overrides: [
         {
+          files: ['**/tests/**/*.ts'],
+          rules: {
+            'no-console': ['off'],
+          },
+        },
+        {
           files: ['**/*.test.ts', '**/*.spec.ts'],
           plugins: ['typescript', 'vitest'],
           rules: {
