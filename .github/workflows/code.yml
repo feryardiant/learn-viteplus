@@ -32,11 +32,9 @@ jobs:
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: 24
           cache: true
-
-      - name: Install
-        run: vp install
+          node-version: lts
+          run-install: true
 
       - name: Lint
         run: vp check
@@ -59,11 +57,9 @@ jobs:
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: 24
           cache: true
-
-      - name: Install
-        run: vp install
+          node-version: lts
+          run-install: true
 
       - name: Get playwright version
         id: playwright

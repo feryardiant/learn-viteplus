@@ -26,7 +26,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     outputs:
-      deploy-env: ${{ steps.install.outputs.deploy-env }}
+      deploy-env: ${{ steps.build.outputs.deploy-env }}
 
     steps:
       - name: Checkout
@@ -38,25 +38,23 @@ jobs:
       - name: Set up Vite+
         uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: 24
           cache: true
-
-      - name: Install
-        id: install
-        run: |
-          vp install
-
-          DEPLOY_ENV=$([[ "$BRANCH_NAME" == "main" ]] && echo "production" || echo "preview")
-          echo "deploy-env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
+          node-version: lts
+          run-install: true
 
       - name: Build
+        id: build
+        env:
+          DEPLOY_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
         run: |
-          vp run -r build -m ${{ steps.install.outputs.deploy-env }}
+          vp run -r build -m $DEPLOY_ENV
+
+          echo "deploy-env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
 
       - name: Store
         uses: actions/upload-artifact@v7
         with:
-          name: website-${{ steps.install.outputs.deploy-env }}
+          name: website-${{ steps.build.outputs.deploy-env }}
           path: apps/website/dist
           include-hidden-files: true
           overwrite: true
