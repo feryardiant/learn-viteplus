@@ -24,6 +24,7 @@
   },
   "scripts": {
     "build": "vp pack",
+    "bump": "bumpp -r",
     "dev": "vp pack --watch",
     "test": "vp test",
     "check": "vp check",
