@@ -72,7 +72,9 @@ jobs:
         if: steps.build.outputs.should-deploy == 1
         with:
           name: website-${{ steps.build.outputs.deploy-env }}
-          path: apps/website/dist
+          path: |
+            apps/website/dist
+            apps/website/wrangler.jsonc
           include-hidden-files: true
           overwrite: true
 
@@ -94,9 +96,9 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: website-${{ needs.build.outputs.deploy-env }}
-          path: to-deploy
 
       - name: Merge build outputs
+        if: false
         run: |
           mv to-deploy/ssr dist && cp -r to-deploy/client/. dist/
           mv dist/index.js dist/_worker.js && mv dist/wrangler.json .
