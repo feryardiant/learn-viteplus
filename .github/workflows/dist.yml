@@ -7,6 +7,9 @@ on:
       branch-name:
         required: true
         type: string
+      sha:
+        required: false
+        type: string
     secrets:
       CLOUDFLARE_API_TOKEN:
         required: true
@@ -47,8 +50,9 @@ jobs:
       - name: Build
         id: build
         env:
-          DEPLOY_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          COMMIT_SHA: ${{ inputs.sha }}
+          DEPLOY_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
         run: |
           vp run -r build -m $DEPLOY_ENV
           node ./scripts/upload-bundle-stats.mjs

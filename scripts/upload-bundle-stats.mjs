@@ -47,6 +47,9 @@ for (const pkgPath of pkgs) {
       bundleName: pkgJson.name,
       uploadToken: process.env.CODECOV_TOKEN,
       enableBundleAnalysis: !!process.env.CODECOV_TOKEN,
+      uploadOverrides: {
+        sha: process.env.COMMIT_SHA,
+      },
       debug: true,
     },
     {
