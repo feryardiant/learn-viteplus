@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       deploy-env: ${{ steps.build.outputs.deploy-env }}
+      should-deploy: ${{ steps.build.outputs.should-deploy || 0 }}
 
     steps:
       - name: Checkout
@@ -68,6 +69,7 @@ jobs:
 
       - name: Store build artifact
         uses: actions/upload-artifact@v7
+        if: steps.build.outputs.should-deploy == 1
         with:
           name: website-${{ steps.build.outputs.deploy-env }}
           path: apps/website/dist
@@ -77,6 +79,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    if: needs.build.outputs.should-deploy == 1
     needs: build
 
     environment:
