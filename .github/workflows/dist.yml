@@ -98,10 +98,8 @@ jobs:
 
       - name: Merge build outputs
         run: |
-          mv to-deploy/ssr dist
-          cp -r to-deploy/client/. dist/
+          mv to-deploy/ssr dist && cp -r to-deploy/client/. dist/
           mv dist/index.js dist/_worker.js
-          mv dist/wrangler.json .
           tree . --dirsfirst -Fa
 
       - name: Build & Deploy Worker
@@ -111,4 +109,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
-            pages deploy dist --project-name=learn-viteplus --branch=${{ env.BRANCH_NAME }}
+            deploy dist --config=dist/wrangler.json --branch=${{ env.BRANCH_NAME }}
