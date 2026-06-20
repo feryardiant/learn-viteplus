@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 import { cloudflare } from '@cloudflare/vite-plugin'
@@ -8,6 +9,7 @@ import { defineConfig, loadEnv, type TestUserConfig, type UserConfig } from 'vit
 
 export default defineConfig(({ mode }): UserConfig => {
   const env = loadEnv(mode, '.', '')
+  const root = fileURLToPath(new URL('./', import.meta.url))
   const reporters: TestUserConfig['reporters'] = ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]]
 
   if (env.GITHUB_ACTIONS === 'true') {
@@ -17,7 +19,7 @@ export default defineConfig(({ mode }): UserConfig => {
   return {
     resolve: {
       alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@': path.join(root, 'src'),
       },
     },
     test: {

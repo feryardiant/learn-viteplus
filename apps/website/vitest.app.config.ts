@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 import tailwindcss from '@tailwindcss/vite'
@@ -6,17 +7,21 @@ import { defineConfig } from 'vite-plus'
 
 import pkg from './package.json' with { type: 'json' }
 
-export default defineConfig({
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+export default defineConfig(() => {
+  const root = fileURLToPath(new URL('./', import.meta.url))
+
+  return {
+    resolve: {
+      alias: {
+        '@': path.join(root, 'src'),
+      },
     },
-  },
-  test: {
-    name: `${pkg.name}:app`,
-    root: fileURLToPath(new URL('.', import.meta.url)),
-    include: ['tests/app/*.spec.ts'],
-    environment: 'jsdom',
-  },
-  plugins: [vue(), tailwindcss()],
+    test: {
+      root,
+      name: `${pkg.name}:app`,
+      include: ['tests/app/*.spec.ts'],
+      environment: 'jsdom',
+    },
+    plugins: [vue(), tailwindcss()],
+  }
 })
