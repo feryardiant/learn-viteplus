@@ -98,11 +98,11 @@ jobs:
           name: website-${{ needs.build.outputs.deploy-env }}
 
       - name: Merge build outputs
-        if: false
         run: |
-          mv to-deploy/ssr dist && cp -r to-deploy/client/. dist/
-          mv dist/index.js dist/_worker.js && mv dist/wrangler.json .
-          rm -rf to-deploy && tree . --dirsfirst -Fa
+          mv dist/ssr/. dist/ && rm -rf dist/ssr
+          mv dist/client/. dist/ && rm -rf dist/client
+          mv dist/index.js dist/_worker.js
+          tree . --dirsfirst -Fa
 
       - name: Build & Deploy Worker
         id: deploy
