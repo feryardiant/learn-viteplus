@@ -17,6 +17,7 @@
     "build": "vp build",
     "prepare": "wrangler types worker/wrangler.d.ts",
     "preview": "vp preview",
+    "upload-bundle": "node scripts/upload-bundle-stats.mjs",
     "test": "vp test"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.40.2",
     "@cloudflare/vitest-pool-workers": "^0.16.16",
+    "@codecov/bundle-analyzer": "^2.0.1",
     "@codecov/vite-plugin": "catalog:",
     "@fontsource-variable/roboto": "^5.2.10",
     "@tailwindcss/vite": "catalog:",
