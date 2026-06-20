@@ -10,10 +10,9 @@ export default defineConfig(({ mode }): UserConfig => {
 
   return {
     pack: {
-      dts: {
-        tsgo: true,
-      },
+      dts: { tsgo: true },
       exports: true,
+      sourcemap: env.GITHUB_ACTIONS === 'true',
     },
     test: {
       include: ['tests/units/*.spec.ts', 'tests/integrations/*.spec.ts'],

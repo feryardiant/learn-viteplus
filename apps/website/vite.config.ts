@@ -15,6 +15,9 @@ export default defineConfig(({ mode }): UserConfig => {
   }
 
   return {
+    build: {
+      sourcemap: env.GITHUB_ACTIONS === 'true',
+    },
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
