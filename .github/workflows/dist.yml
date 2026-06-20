@@ -45,7 +45,6 @@ jobs:
         uses: voidzero-dev/setup-vp@v1
         with:
           cache: true
-          node-version: lts
           run-install: true
 
       - name: Set up vite build cache
