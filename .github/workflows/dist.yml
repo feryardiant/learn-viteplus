@@ -47,6 +47,13 @@ jobs:
           node-version: lts
           run-install: true
 
+      - name: Set up vite build cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/node_modules/.vite/task-cache
+          key: vite-build-${{ hashFiles('**/bun.lock') }}
+          restore-keys: vite-build-
+
       - name: Build
         id: build
         env:
@@ -59,7 +66,7 @@ jobs:
 
           echo "deploy-env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
 
-      - name: Store
+      - name: Store build artifact
         uses: actions/upload-artifact@v7
         with:
           name: website-${{ steps.build.outputs.deploy-env }}
