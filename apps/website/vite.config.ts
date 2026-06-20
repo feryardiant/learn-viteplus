@@ -42,6 +42,7 @@ export default defineConfig(({ mode }): UserConfig => {
         enableBundleAnalysis: 'GITHUB_ACTIONS' in env && !!env.CODECOV_TOKEN,
         bundleName: pkg.name,
         uploadToken: env.CODECOV_TOKEN,
+        dryRun: true,
       }),
     ].filter(Boolean),
   }
