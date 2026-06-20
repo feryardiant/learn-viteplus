@@ -1,5 +1,6 @@
 import { Console } from 'node:console'
-import { createWriteStream, existsSync, readFileSync } from 'node:fs'
+import { createWriteStream, existsSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 
 import { createAndUploadReport } from '@codecov/bundle-analyzer'
@@ -12,7 +13,12 @@ const pkgs = await glob(repo.workspaces, {
   onlyDirectories: true,
 })
 
-const uploadConfig = {
+interface UploadConfig {
+  buildPaths: string[]
+  ignorePatterns: string[]
+}
+
+const uploadConfig: Record<string, UploadConfig> = {
   website: {
     buildPaths: ['./dist/client', './dist/ssr'],
     ignorePatterns: ['*.ico', '*.map', '.assetsignore', 'wrangler.json'],
@@ -23,10 +29,7 @@ const skipped = []
 
 for (const pkgPath of pkgs) {
   const pkg = basename(pkgPath)
-  const { buildPaths, ignorePatterns } = uploadConfig[pkg] || {
-    buildPaths: ['./dist'],
-    ignorePatterns: ['*.map'],
-  }
+  const { buildPaths, ignorePatterns } = uploadConfig[pkg] || { buildPaths: ['./dist'], ignorePatterns: ['*.map'] }
 
   const buildPathsAbs = buildPaths.map((path) => resolve(pkgPath, path))
 
@@ -37,21 +40,18 @@ for (const pkgPath of pkgs) {
     continue
   }
 
-  const pkgJsonFile = readFileSync(resolve(pkgPath, 'package.json'), 'utf8')
-  const pkgJson = JSON.parse(pkgJsonFile)
+  const pkgJson = await readFile(resolve(pkgPath, 'package.json'), 'utf8').then((content) => JSON.parse(content))
 
   console.log(`::group::Uploading '${pkgJson.name}' bundle stats...`)
 
   // Upload bundle
   await createAndUploadReport(
-    buildPaths.map((path) => resolve(pkgPath, path)),
+    buildPathsAbs,
     {
       bundleName: pkgJson.name,
       uploadToken: process.env.CODECOV_TOKEN,
       enableBundleAnalysis: !!process.env.CODECOV_TOKEN,
-      uploadOverrides: {
-        sha: process.env.COMMIT_SHA,
-      },
+      uploadOverrides: { sha: process.env.COMMIT_SHA },
       dryRun: !process.env.GITHUB_ACTIONS,
       debug: 'RUNNER_DEBUG' in process.env,
     },
@@ -64,16 +64,13 @@ for (const pkgPath of pkgs) {
   console.log(`::endgroup::`)
 }
 
-// All bundle skipped.
-if (skipped.length === pkgs.length) process.exit(0)
-
 if (skipped.length < pkgs.length) {
   console.log(`${skipped.length}/${pkgs.length} bundles uploaded successfully`)
 }
 
-if (skipped.includes('website')) process.exit(0)
+// All bundle skipped.
+if (skipped.length === pkgs.length || skipped.includes('website') || !process.env.GITHUB_OUTPUT) process.exit(0)
 
-const output = createWriteStream(process.env.GITHUB_OUTPUT)
-const print = new Console(output)
+const logger = new Console(createWriteStream(process.env.GITHUB_OUTPUT))
 
-print.log('should-deploy=%d', 1)
+logger.log('should-deploy=%d', 1)

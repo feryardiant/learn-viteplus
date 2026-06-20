@@ -63,7 +63,7 @@ jobs:
           DEPLOY_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
         run: |
           vp run -r build -m $DEPLOY_ENV
-          node ./scripts/upload-bundle-stats.mjs
+          node ./scripts/upload-bundle-stats.ts
 
           echo "deploy-env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
 
