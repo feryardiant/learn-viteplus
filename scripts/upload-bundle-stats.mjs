@@ -1,5 +1,5 @@
 import { Console } from 'node:console'
-import { existsSync, readFileSync } from 'node:fs'
+import { createWriteStream, existsSync, readFileSync } from 'node:fs'
 import { basename, resolve } from 'node:path'
 
 import { createAndUploadReport } from '@codecov/bundle-analyzer'
@@ -73,6 +73,7 @@ if (skipped.length < pkgs.length) {
 
 if (skipped.includes('website')) process.exit(0)
 
-const output = new Console(process.env.GITHUB_OUTPUT)
+const output = createWriteStream(process.env.GITHUB_OUTPUT)
+const print = new Console(output)
 
-output.log('should-deploy=%d', 1)
+print.log('should-deploy=%d', 1)
