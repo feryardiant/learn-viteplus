@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+
 import heroImg from '@/assets/hero.png'
 import typescriptLogo from '@/assets/typescript.svg'
 import viteLogo from '@/assets/vite.svg'
@@ -7,6 +9,10 @@ import Tick from '@/components/tick.vue'
 import { useCounterStore } from '@/stores/counter'
 
 const counter = useCounterStore()
+
+onMounted(async () => {
+  await counter.fetchCount()
+})
 
 const docLinks: CardLinkProp[] = [
   { href: 'https://vite.dev/', label: 'Explore Vite', icon: viteLogo },
@@ -35,9 +41,9 @@ const socialLinks: CardLinkProp[] = [
     </div>
 
     <div id="counter">
-      <button type="button" class="counter" @click="() => counter.increment()">Count is {{ counter.count }}</button>
+      <button type="button" class="counter" @click="counter.increment">Count is {{ counter.count }}</button>
 
-      <button type="reset" class="counter" @click="() => counter.reset()">Reset</button>
+      <button type="reset" class="counter" @click="counter.reset">Reset</button>
     </div>
   </section>
 

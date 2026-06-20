@@ -1,17 +1,37 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
 
-export const useCounterStore = defineStore('counter', () => {
-  const count = ref(0)
-  const doubleCount = computed(() => count.value * 2)
+export const useCounterStore = defineStore('counter', {
+  state: () => ({
+    count: 0,
+  }),
 
-  function increment() {
-    count.value++
-  }
+  actions: {
+    async fetchCount() {
+      if (import.meta.env.SSR) return
 
-  function reset() {
-    count.value = 0
-  }
+      this.count = await apiCounter('GET')
+    },
 
-  return { count, doubleCount, increment, reset }
+    async increment() {
+      if (import.meta.env.SSR) return
+
+      this.count = await apiCounter('PUT')
+    },
+
+    async reset() {
+      if (import.meta.env.SSR) return
+
+      this.count = await apiCounter('DELETE')
+    },
+  },
 })
+
+async function apiCounter(method: 'GET' | 'PUT' | 'DELETE'): Promise<number> {
+  try {
+    const { count } = await fetch('/api/counter', { method }).then((res) => res.json())
+
+    return count
+  } catch {
+    return 0
+  }
+}

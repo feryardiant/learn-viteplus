@@ -15,9 +15,13 @@
   "scripts": {
     "dev": "vp dev",
     "build": "vp build",
+    "migrate": "wrangler d1 migrations apply learn-viteplus",
+    "migration:make": "wrangler d1 migrations create learn-viteplus",
+    "migration:list": "wrangler d1 migrations list learn-viteplus",
     "prepare": "wrangler types worker/wrangler.d.ts",
     "preview": "vp preview",
-    "test": "vp test"
+    "test": "vp test",
+    "wrangler": "wrangler"
   },
   "dependencies": {
     "h3": "^2.0.1-rc.22",
