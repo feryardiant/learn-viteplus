@@ -101,7 +101,8 @@ jobs:
           mv to-deploy/ssr dist
           cp -r to-deploy/client/. dist/
           mv dist/index.js dist/_worker.js
-          ls -lah dist/
+          mv dist/wrangler.json .
+          tree . --dirsfirst -Fa
 
       - name: Build & Deploy Worker
         id: deploy
