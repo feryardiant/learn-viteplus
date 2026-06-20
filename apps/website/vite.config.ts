@@ -39,7 +39,7 @@ export default defineConfig(({ mode }): UserConfig => {
       tailwindcss(),
       vueDevTools(),
       codecovVitePlugin({
-        enableBundleAnalysis: 'CODECOV_TOKEN' in env && env.CODECOV_TOKEN !== '',
+        enableBundleAnalysis: 'GITHUB_ACTIONS' in env && !!env.CODECOV_TOKEN,
         bundleName: pkg.name,
         uploadToken: env.CODECOV_TOKEN,
       }),
