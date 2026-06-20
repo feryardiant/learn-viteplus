@@ -40,7 +40,7 @@ export default defineConfig(({ mode }): UserConfig => {
       vueDevTools(),
       codecovVitePlugin({
         enableBundleAnalysis: 'CODECOV_TOKEN' in env && env.CODECOV_TOKEN !== '',
-        bundleName: pkg.name,
+        bundleName: `${pkg.name}-${env.VITE_ENVIRONMENT}`,
         uploadToken: env.CODECOV_TOKEN,
       }),
     ].filter(Boolean),
