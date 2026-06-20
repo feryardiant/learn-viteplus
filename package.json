@@ -23,8 +23,8 @@
     "@codecov/bundle-analyzer": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-istanbul": "catalog:",
-    "micromatch": "^4.0.8",
     "playwright": "^1.61.0",
+    "tinyglobby": "^0.2.17",
     "vite-plus": "catalog:"
   },
   "overrides": {
