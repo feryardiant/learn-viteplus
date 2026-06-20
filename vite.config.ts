@@ -50,7 +50,7 @@ export default defineConfig(({ mode }): UserConfig => {
       options: { typeAware: true, typeCheck: true },
       overrides: [
         {
-          files: ['**/tests/**/*.ts'],
+          files: ['**/tests/**/*.ts', '**/scripts/**/*.{js,mjs,ts}', '**/*.config.ts'],
           rules: {
             'no-console': ['off'],
           },

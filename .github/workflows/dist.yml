@@ -7,10 +7,15 @@ on:
       branch-name:
         required: true
         type: string
+      sha:
+        required: false
+        type: string
     secrets:
       CLOUDFLARE_API_TOKEN:
         required: true
       CLOUDFLARE_ACCOUNT_ID:
+        required: true
+      CODECOV_TOKEN:
         required: true
   workflow_dispatch:
 
@@ -45,9 +50,12 @@ jobs:
       - name: Build
         id: build
         env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          COMMIT_SHA: ${{ inputs.sha }}
           DEPLOY_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
         run: |
           vp run -r build -m $DEPLOY_ENV
+          node ./scripts/upload-bundle-stats.mjs
 
           echo "deploy-env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
 
