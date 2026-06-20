@@ -99,9 +99,10 @@ jobs:
 
       - name: Merge build outputs
         run: |
-          mv dist/ssr/. dist/ && rm -rf dist/ssr
-          mv dist/client/. dist/ && rm -rf dist/client
+          mv dist _dist; mv _dist/ssr dist
           mv dist/index.js dist/_worker.js
+          cp -r _dist/client/. dist/
+          rm -rf _dist dist/wrangler.json
           tree . --dirsfirst -Fa
 
       - name: Build & Deploy Worker
