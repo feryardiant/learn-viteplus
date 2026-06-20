@@ -31,7 +31,14 @@ export default defineConfig(({ mode }): UserConfig => {
       },
     },
     plugins: [
-      env.VITEST ? undefined : cloudflare({ viteEnvironment: { name: 'ssr' } }),
+      env.VITEST
+        ? undefined
+        : cloudflare({
+            viteEnvironment: { name: 'ssr' },
+            config(config) {
+              config.d1_databases[0].database_id = env.DATABASE_ID
+            },
+          }),
       vue(),
       tailwindcss(),
       vueDevTools(),
