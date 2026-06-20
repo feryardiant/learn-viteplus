@@ -16,7 +16,7 @@
     },
     "apps/website": {
       "name": "@feryardiant/lvp-web",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "dependencies": {
         "h3": "^2.0.1-rc.22",
         "pinia": "^3.0.4",
@@ -46,7 +46,7 @@
     },
     "packages/utils": {
       "name": "@feryardiant/lvp-utils",
-      "version": "0.0.0",
+      "version": "0.0.1",
       "devDependencies": {
         "@types/node": "catalog:",
         "@typescript/native-preview": "catalog:",
