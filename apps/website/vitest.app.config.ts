@@ -19,7 +19,7 @@ export default defineConfig(() => {
     test: {
       root,
       name: `${pkg.name}:app`,
-      include: ['tests/app/*.spec.ts'],
+      include: ['tests/app/**/*.spec.ts'],
       environment: 'jsdom',
     },
     plugins: [vue(), tailwindcss()],

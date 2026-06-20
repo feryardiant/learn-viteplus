@@ -16,12 +16,13 @@ export default defineConfig(async () => {
     resolve: {
       alias: {
         '@': path.join(root, 'src'),
+        '~': path.join(root, 'worker'),
       },
     },
     test: {
       root,
       name: `${pkg.name}:worker`,
-      include: ['tests/worker/*.spec.ts'],
+      include: ['tests/worker/**/*.spec.ts'],
       setupFiles: ['tests/worker/setup.ts'],
     },
     plugins: [
