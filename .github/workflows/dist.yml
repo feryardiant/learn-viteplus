@@ -51,7 +51,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
           vp run -r build -m $DEPLOY_ENV
-          vp run @feryardiant/lvp-web#upload-bundle
+          node ./scripts/upload-bundle-stats.mjs
 
           echo "deploy-env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
 
