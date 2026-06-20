@@ -1,0 +1,13 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish
+    uses: projek-xyz/actions/.github/workflows/release.yml@main
