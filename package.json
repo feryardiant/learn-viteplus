@@ -15,6 +15,7 @@
   ],
   "type": "module",
   "scripts": {
+    "bump": "bumpp -y -r",
     "ready": "vp check && vp run -r test && vp run -r build",
     "dev": "vp run @feryardiant/lvp-web#dev",
     "prepare": "vp config"
