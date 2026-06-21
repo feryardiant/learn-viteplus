@@ -39,10 +39,6 @@ export default defineConfig(({ mode }): UserConfig => {
             viteEnvironment: { name: 'ssr' },
             config(config) {
               config.d1_databases[0].database_id = env.DATABASE_ID
-
-              if (config.definedEnvironments?.includes(mode)) {
-                config.targetEnvironment = mode
-              }
             },
           }),
       vue(),

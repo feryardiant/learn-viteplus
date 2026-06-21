@@ -14,11 +14,11 @@ const app = new H3({
   },
 })
 
-app.use(({ req }, next) => {
+app.use(({ context: { env }, req }, next) => {
   const url = new URL(req.url)
 
   if (!url.pathname.startsWith('/api') && !req.headers.get('accept')?.includes('text/html')) {
-    return fetch(url, req)
+    return env.ASSETS.fetch(url, req)
   }
 
   if (!req.ip) {
@@ -31,7 +31,7 @@ app.use(({ req }, next) => {
 app.mount('/api', apiRoutes)
 
 app.get('/**', async ({ context: { env }, req }) => {
-  const body = await fetch(new URL('/index.html', req.url)).then(async (res) => {
+  const body = await env.ASSETS.fetch(new URL('/index.html', req.url)).then(async (res) => {
     const template = await res.text()
     const { html } = await render(new URL(req.url), { env, req })
 
