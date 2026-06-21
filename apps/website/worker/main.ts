@@ -21,6 +21,10 @@ app.use(({ context: { env }, req }, next) => {
     return env.ASSETS.fetch(url, req)
   }
 
+  if (!req.ip) {
+    req.ip = req.headers.get('cf-connecting-ip') || undefined
+  }
+
   return next()
 })
 

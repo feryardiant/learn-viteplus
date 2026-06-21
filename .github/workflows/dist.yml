@@ -10,6 +10,9 @@ on:
       sha:
         required: false
         type: string
+      pr:
+        required: false
+        type: number
     secrets:
       CLOUDFLARE_API_TOKEN:
         required: true
@@ -31,7 +34,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     outputs:
-      deploy-env: ${{ steps.build.outputs.deploy-env }}
+      deploy-env: ${{ steps.prepare.outputs.deploy-env }}
       should-deploy: ${{ steps.build.outputs.should-deploy || 0 }}
 
     steps:
@@ -55,24 +58,32 @@ jobs:
           key: vite-build-${{ hashFiles('**/bun.lock') }}
           restore-keys: vite-build-
 
+      - name: Prepare
+        id: prepare
+        env:
+          DEPLOY_TARGET: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
+        run: |
+          echo "CLOUDFLARE_ENV=$DEPLOY_TARGET" >> $GITHUB_ENV
+          echo "deploy-env=$DEPLOY_TARGET" >> $GITHUB_OUTPUT
+
       - name: Build
         id: build
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           COMMIT_SHA: ${{ inputs.sha }}
-          DEPLOY_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
         run: |
-          vp run -r build -m $DEPLOY_ENV
+          vp run -r build -m ${{ steps.prepare.outputs.deploy-env }}
           node ./scripts/upload-bundle-stats.ts
-
-          echo "deploy-env=$DEPLOY_ENV" >> $GITHUB_OUTPUT
 
       - name: Store build artifact
         uses: actions/upload-artifact@v7
         if: steps.build.outputs.should-deploy == 1
         with:
-          name: website-${{ steps.build.outputs.deploy-env }}
-          path: apps/website/dist
+          name: website-${{ steps.prepare.outputs.deploy-env }}
+          path: |
+            apps/website/.wrangler
+            apps/website/dist
+            apps/website/wrangler.jsonc
           include-hidden-files: true
           overwrite: true
 
@@ -84,7 +95,7 @@ jobs:
 
     environment:
       name: ${{ needs.build.outputs.deploy-env }}
-      url: ${{ steps.deploy.outputs.pages-deployment-alias-url || vars.BASE_URL }}
+      url: ${{ steps.deploy.outputs.deployment-url || vars.BASE_URL }}
 
     permissions:
       contents: read
@@ -94,20 +105,13 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: website-${{ needs.build.outputs.deploy-env }}
-          path: to-deploy
 
-      - name: Merge build outputs
-        run: |
-          mv to-deploy/ssr dist
-          cp -r to-deploy/client/. dist/
-          mv dist/index.js dist/_worker.js
-          ls -lah dist/
-
-      - name: Build & Deploy Worker
+      - name: Deploy
         id: deploy
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          environment: ${{ needs.build.outputs.deploy-env }}
           command: |
-            pages deploy dist --project-name=learn-viteplus --branch=${{ env.BRANCH_NAME }}
+            ${{ needs.build.outputs.deploy-env == 'production' && 'deploy' || format('versions upload --preview-alias pr{0}', inputs.pr) }}

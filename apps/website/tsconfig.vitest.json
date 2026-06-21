@@ -12,6 +12,11 @@
     "lib": [],
     "types": ["@cloudflare/vitest-pool-workers/types", "node", "vite-plus/test/jsdom", "./worker/wrangler.d.ts"],
 
+    "paths": {
+      "@/*": ["./src/*"],
+      "~/*": ["./worker/*"]
+    },
+
     // `vue-tsc --build` produces a .tsbuildinfo file for incremental type-checking.
     // Specified here to keep it out of the root directory.
     "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.vitest.tsbuildinfo"

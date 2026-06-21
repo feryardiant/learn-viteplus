@@ -1,18 +1,17 @@
 import { mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
-import { describe, it, expect } from 'vite-plus/test'
+import { describe, expect, it } from 'vite-plus/test'
 
 import { createRouter } from '@/app'
 import App from '@/app.vue'
 
-const pinia = createPinia()
 const router = createRouter()
 
 describe('App', () => {
   it('mounts renders properly', () => {
     const wrapper = mount(App, {
       global: {
-        plugins: [router, pinia],
+        plugins: [router, createPinia()],
       },
     })
 
