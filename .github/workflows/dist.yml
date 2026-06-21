@@ -38,8 +38,8 @@ jobs:
       contents: read
 
     environment:
-      name: ${{ needs.build.outputs.deploy-env }}
-      url: ${{ steps.deploy.outputs.pages-deployment-alias-url || vars.BASE_URL }}
+      name: ${{ steps.env.outputs.target }}
+      # url: ${{ steps.deploy.outputs.pages-deployment-alias-url || vars.BASE_URL }}
 
     steps:
       - name: Checkout
@@ -62,10 +62,17 @@ jobs:
           key: vite-build-${{ hashFiles('**/bun.lock') }}
           restore-keys: vite-build-
 
+      - name: Prepare
+        id: env
+        env:
+          TARGET_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
+        run: |
+          echo "CLOUDFLARE_ENV=$TARGET_ENV" >> $GITHUB_ENV
+          echo "target=$TARGET_ENV" >> $GITHUB_OUTPUT
+
       - name: Build
         id: build
         env:
-          CLOUDFLARE_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           COMMIT_SHA: ${{ inputs.sha }}
         run: |
@@ -75,10 +82,20 @@ jobs:
       - name: Deploy
         id: deploy
         if: steps.build.outputs.should-deploy == 1
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          environment: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
-          command: |
-            deploy --cwd ./apps/website
+        working-directory: apps/website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          vp exec --filter lvp-web wrangler deploy
+
+      # - name: Deploy
+      #   id: deploy
+      #   if: steps.build.outputs.should-deploy == 1
+      #   uses: cloudflare/wrangler-action@v4
+      #   with:
+      #     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      #     accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      #     environment: ${{ steps.env.outputs.target }}
+      #     command: |
+      #       deploy --cwd ./apps/website
