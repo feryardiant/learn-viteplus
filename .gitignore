@@ -33,6 +33,7 @@ dist-ssr
 .cursor
 .gemini
 .github/copilot-instructions.md
+.opencode
 CLAUDE.md
 GEMINI.md
 
