@@ -31,15 +31,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     outputs:
-      deploy-env: ${{ steps.build.outputs.deploy-env }}
+      deploy-env: ${{ steps.prepare.outputs.deploy-env }}
       should-deploy: ${{ steps.build.outputs.should-deploy || 0 }}
-
-    permissions:
-      contents: read
-
-    environment:
-      name: ${{ steps.env.outputs.target }}
-      # url: ${{ steps.deploy.outputs.pages-deployment-alias-url || vars.BASE_URL }}
 
     steps:
       - name: Checkout
@@ -63,12 +56,12 @@ jobs:
           restore-keys: vite-build-
 
       - name: Prepare
-        id: env
+        id: prepare
         env:
-          TARGET_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
+          DEPLOY_TARGET: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
         run: |
-          echo "CLOUDFLARE_ENV=$TARGET_ENV" >> $GITHUB_ENV
-          echo "target=$TARGET_ENV" >> $GITHUB_OUTPUT
+          echo "CLOUDFLARE_ENV=$DEPLOY_TARGET" >> $GITHUB_ENV
+          echo "deploy-env=$DEPLOY_TARGET" >> $GITHUB_OUTPUT
 
       - name: Build
         id: build
@@ -76,26 +69,46 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           COMMIT_SHA: ${{ inputs.sha }}
         run: |
-          vp run -r build -m $CLOUDFLARE_ENV
+          vp run -r build -m ${{ steps.prepare.outputs.deploy-env }}
           node ./scripts/upload-bundle-stats.ts
 
-      - name: Deploy
-        id: deploy
+      - name: Store build artifact
+        uses: actions/upload-artifact@v7
         if: steps.build.outputs.should-deploy == 1
-        working-directory: apps/website
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          vp exec --filter lvp-web wrangler deploy
+        with:
+          name: website-${{ steps.prepare.outputs.deploy-env }}
+          path: |
+            apps/website/.wrangler
+            apps/website/dist
+            apps/website/wrangler.jsonc
+          include-hidden-files: true
+          overwrite: true
 
-      # - name: Deploy
-      #   id: deploy
-      #   if: steps.build.outputs.should-deploy == 1
-      #   uses: cloudflare/wrangler-action@v4
-      #   with:
-      #     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      #     accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      #     environment: ${{ steps.env.outputs.target }}
-      #     command: |
-      #       deploy --cwd ./apps/website
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: needs.build.outputs.should-deploy == 1
+    needs: build
+
+    environment:
+      name: ${{ needs.build.outputs.deploy-env }}
+      url: ${{ steps.deploy.outputs.pages-deployment-alias-url || vars.BASE_URL }}
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Prepare
+        uses: actions/download-artifact@v8
+        with:
+          name: website-${{ needs.build.outputs.deploy-env }}
+
+      - name: Build & Deploy Worker
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          environment: ${{ needs.build.outputs.deploy-env }}
+          command: |
+            deploy
