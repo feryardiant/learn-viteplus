@@ -10,6 +10,9 @@ on:
       sha:
         required: false
         type: string
+      pr:
+        required: false
+        type: number
     secrets:
       CLOUDFLARE_API_TOKEN:
         required: true
@@ -33,7 +36,6 @@ jobs:
     outputs:
       deploy-env: ${{ steps.prepare.outputs.deploy-env }}
       should-deploy: ${{ steps.build.outputs.should-deploy || 0 }}
-      preview-alias: ${{ steps.prepare.outputs.preview-alias }}
 
     steps:
       - name: Checkout
@@ -63,10 +65,6 @@ jobs:
         run: |
           echo "CLOUDFLARE_ENV=$DEPLOY_TARGET" >> $GITHUB_ENV
           echo "deploy-env=$DEPLOY_TARGET" >> $GITHUB_OUTPUT
-
-          # Sanitize branch name for preview alias (only [a-z0-9-] allowed)
-          SANITIZED_BRANCH=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
-          echo "preview-alias=$SANITIZED_BRANCH" >> $GITHUB_OUTPUT
 
       - name: Build
         id: build
@@ -108,7 +106,7 @@ jobs:
         with:
           name: website-${{ needs.build.outputs.deploy-env }}
 
-      - name: Build & Deploy Worker
+      - name: Deploy
         id: deploy
         uses: cloudflare/wrangler-action@v4
         with:
@@ -116,4 +114,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           environment: ${{ needs.build.outputs.deploy-env }}
           command: |
-            ${{ needs.build.outputs.deploy-env == 'production' && 'deploy' || format('versions upload --preview-alias {0}', needs.build.outputs.preview-alias) }}
+            ${{ needs.build.outputs.deploy-env == 'production' && 'deploy' || format('versions upload --preview-alias pr{0}', inputs.pr) }}

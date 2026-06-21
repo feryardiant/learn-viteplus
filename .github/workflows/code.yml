@@ -126,4 +126,5 @@ jobs:
     with:
       branch-name: ${{ github.event.pull_request.head.ref || github.ref_name }}
       sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      pr: ${{ github.event.pull_request.number }}
     secrets: inherit
