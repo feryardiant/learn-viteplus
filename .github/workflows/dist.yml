@@ -34,6 +34,13 @@ jobs:
       deploy-env: ${{ steps.build.outputs.deploy-env }}
       should-deploy: ${{ steps.build.outputs.should-deploy || 0 }}
 
+    permissions:
+      contents: read
+
+    environment:
+      name: ${{ needs.build.outputs.deploy-env }}
+      url: ${{ steps.deploy.outputs.pages-deployment-alias-url || vars.BASE_URL }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -58,60 +65,20 @@ jobs:
       - name: Build
         id: build
         env:
+          CLOUDFLARE_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           COMMIT_SHA: ${{ inputs.sha }}
-          CLOUDFLARE_ENV: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
         run: |
           vp run -r build -m $CLOUDFLARE_ENV
           node ./scripts/upload-bundle-stats.ts
 
-          echo "deploy-env=$CLOUDFLARE_ENV" >> $GITHUB_OUTPUT
-
-      - name: Store build artifact
-        uses: actions/upload-artifact@v7
-        if: steps.build.outputs.should-deploy == 1
-        with:
-          name: website-${{ steps.build.outputs.deploy-env }}
-          path: |
-            apps/website/dist
-            apps/website/wrangler.jsonc
-          include-hidden-files: true
-          overwrite: true
-
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    if: needs.build.outputs.should-deploy == 1
-    needs: build
-
-    environment:
-      name: ${{ needs.build.outputs.deploy-env }}
-      url: ${{ steps.deploy.outputs.pages-deployment-alias-url || vars.BASE_URL }}
-
-    permissions:
-      contents: read
-
-    steps:
-      - name: Prepare
-        uses: actions/download-artifact@v8
-        with:
-          name: website-${{ needs.build.outputs.deploy-env }}
-
-      - name: Merge build outputs
-        run: |
-          # mv dist _dist; mv _dist/ssr dist
-          # mv dist/index.js dist/_worker.js
-          # cp -r _dist/client/. dist/
-          # rm -rf _dist dist/wrangler.json
-          # mv dist/ssr/index.js dist/ssr/_worker.js
-          tree . --dirsfirst -Fa
-
-      - name: Build & Deploy Worker
+      - name: Deploy
         id: deploy
+        if: steps.build.outputs.should-deploy == 1
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          environment: ${{ needs.build.outputs.deploy-env }}
+          environment: ${{ env.BRANCH_NAME == 'main' && 'production' || 'preview' }}
           command: |
-            deploy
+            deploy --cwd ./apps/website
