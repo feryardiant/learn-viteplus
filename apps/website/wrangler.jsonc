@@ -21,7 +21,13 @@
       "d1_databases": [],
     },
     "preview": {
-      "d1_databases": [],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "learn-viteplus",
+          "migrations_dir": "migrations",
+        },
+      ],
     },
   },
 }
