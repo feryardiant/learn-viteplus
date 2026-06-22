@@ -10,17 +10,22 @@ export default defineConfig(({ mode }): UserConfig => {
 
   return {
     pack: {
+      entry: ['src/*.ts'],
       dts: { tsgo: true },
       exports: true,
-    },
-    test: {
-      include: ['tests/**/*.spec.ts'],
-      reporters,
-      coverage: {
-        enabled: 'GITHUB_ACTIONS' in env,
-        provider: 'istanbul',
-        include: ['src/**'],
-        reportsDirectory: 'tests/reports/coverage',
+      deps: {
+        neverBundle: [
+          'vite-plus',
+          'vite',
+          '@cloudflare/vite-plugin',
+          '@cloudflare/vitest-pool-workers',
+          '@tailwindcss/vite',
+          '@vitejs/plugin-vue',
+          'vite-plugin-vue-devtools',
+          '@vitest/coverage-istanbul',
+          'vue',
+          'tailwindcss',
+        ],
       },
     },
   }

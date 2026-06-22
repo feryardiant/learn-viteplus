@@ -1,4 +1,6 @@
 {
+  "include": ["src/**/*.ts"],
+
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["ES2023"],

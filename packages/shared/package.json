@@ -2,11 +2,11 @@
   "name": "@learn-viteplus/shared",
   "version": "0.0.1",
   "private": true,
-  "description": "A shared back-end library for `learn-viteplus` Pages and Worker.",
+  "description": "A shared configuration library for `learn-viteplus` Pages and Worker.",
   "license": "MIT",
   "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
   "repository": {
-    "directory": "packages/backend"
+    "directory": "packages/shared"
   },
   "files": [
     "dist"
@@ -14,6 +14,9 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.mjs",
+    "./vite": "./dist/vite.mjs",
+    "./vitest-app": "./dist/vitest-app.mjs",
+    "./vitest-worker": "./dist/vitest-worker.mjs",
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -25,7 +28,6 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@typescript/native-preview": "catalog:",
-    "@vitest/coverage-istanbul": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:"
   }
