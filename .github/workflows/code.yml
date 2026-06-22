@@ -39,6 +39,7 @@ jobs:
         id: pkgs
         run: |
           PKGS=$(find apps packages -maxdepth 2 -name "package.json" \
+            -exec sh -c 'test -d "$(dirname "$1")/tests"' _ {} \; -print \
             | xargs jq -r '.name' | jq -R -s 'split("\n") | map(select(length > 0))' -c)
 
           echo "list=$PKGS" >> $GITHUB_OUTPUT
