@@ -1,20 +1,17 @@
 {
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": ["./src/**/*.ts", "./src/**/*.vue"],
+  "exclude": [],
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["ES2023"],
-    "moduleDetection": "force",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "resolveJsonModule": true,
-    "types": ["node"],
-    "strict": true,
-    "noUnusedLocals": true,
-    "declaration": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "skipLibCheck": true
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "types": ["node", "vite-plus/client", "jsdom"],
+
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.frontend.tsbuildinfo"
   }
 }

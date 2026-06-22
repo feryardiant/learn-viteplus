@@ -1,27 +1,38 @@
-import { defineConfig, loadEnv, type TestUserConfig, type UserConfig } from 'vite-plus'
+import { sharedViteConfig } from '@learn-viteplus/shared'
+import vue from '@vitejs/plugin-vue'
+import vuePack from 'unplugin-vue/rolldown'
+import { defineConfig } from 'vite-plus'
 
-export default defineConfig(({ mode }): UserConfig => {
-  const env = loadEnv(mode, '.', '')
-  const reporters: TestUserConfig['reporters'] = ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]]
-
-  if (env.GITHUB_ACTIONS === 'true') {
-    reporters.push('github-actions')
-  }
+export default defineConfig(() => {
+  const base = sharedViteConfig(import.meta.dirname)
 
   return {
+    ...base,
     pack: {
-      dts: { tsgo: true },
-      exports: true,
-    },
-    test: {
-      include: ['tests/**/*.spec.ts'],
-      reporters,
-      coverage: {
-        enabled: 'GITHUB_ACTIONS' in env,
-        provider: 'istanbul',
-        include: ['src/**'],
-        reportsDirectory: 'tests/reports/coverage',
+      dts: { vue: true },
+      deps: {
+        neverBundle: ['vue', 'pinia', 'tailwindcss'],
       },
+      entry: ['./src/*.ts'],
+      exports: {
+        customExports(exports) {
+          exports['.'] = {
+            style: './style.css',
+            import: exports['.'],
+          }
+
+          exports['./assets/*'] = './assets/*'
+
+          return exports
+        },
+      },
+      platform: 'neutral',
+      plugins: [vuePack({})],
     },
-  }
+    plugins: [vue()],
+    test: {
+      ...base.test,
+      environment: 'jsdom',
+    },
+  } as ReturnType<typeof sharedViteConfig>
 })

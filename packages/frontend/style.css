@@ -1,0 +1,132 @@
+@import '@fontsource-variable/roboto/wdth-italic.css';
+@import 'tailwindcss' source('.');
+
+@theme {
+  --default-font-family: 'Roboto Variable', sans-serif;
+  --font-heading: 'Roboto Variable', sans-serif;
+  --font-sans: system-ui, 'Roboto Variable', sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
+
+  --color-bg: #fff;
+  --color-border: #e5e4e7;
+  --color-text-muted: #6b6375;
+  --color-text-heading: #08060d;
+  --color-code-bg: #f4f3ec;
+  --color-accent: #aa3bff;
+  --color-accent-bg: rgba(170, 59, 255, 0.1);
+  --color-accent-border: rgba(170, 59, 255, 0.5);
+  --color-social-bg: rgba(244, 243, 236, 0.5);
+  --shadow-custom: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+}
+
+@layer base {
+  :root {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    line-height: 145%;
+    letter-spacing: 0.18px;
+    color: var(--color-text-muted);
+    background: var(--color-bg);
+    color-scheme: light dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    @media (max-width: 1024px) {
+      font-size: 16px;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading font-semibold;
+  }
+
+  h1,
+  h2 {
+    color: var(--color-text-heading);
+  }
+
+  h1 {
+    font-size: 56px;
+    letter-spacing: -1.68px;
+    margin: 32px 0;
+
+    @media (max-width: 1024px) {
+      font-size: 36px;
+      margin: 20px 0;
+    }
+  }
+
+  h2 {
+    font-size: 24px;
+    line-height: 118%;
+    letter-spacing: -0.24px;
+    margin: 0 0 8px;
+
+    @media (max-width: 1024px) {
+      font-size: 20px;
+    }
+  }
+
+  p {
+    margin: 0;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    display: inline-flex;
+    border-radius: 4px;
+    font-size: 15px;
+    line-height: 135%;
+    padding: 4px 8px;
+    color: var(--color-text-heading);
+    background: var(--color-code-bg);
+  }
+}
+
+#app {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  border-inline: 1px solid var(--color-border);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+#center {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  place-content: center;
+  place-items: center;
+  flex-grow: 1;
+
+  @media (max-width: 1024px) {
+    padding: 32px 20px 24px;
+    gap: 18px;
+  }
+}
+
+@variant dark {
+  :root {
+    --color-text-muted: #9ca3af;
+    --color-text-heading: #f3f4f6;
+    --color-bg: #16171d;
+    --color-border: #2e303a;
+    --color-code-bg: #1f2028;
+    --color-accent: #c084fc;
+    --color-accent-bg: rgba(192, 132, 252, 0.15);
+    --color-accent-border: rgba(192, 132, 252, 0.5);
+    --color-social-bg: rgba(47, 48, 58, 0.5);
+    --shadow-custom: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+}
