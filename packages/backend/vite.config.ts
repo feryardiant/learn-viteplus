@@ -1,27 +1,17 @@
-import { defineConfig, loadEnv, type TestUserConfig, type UserConfig } from 'vite-plus'
+import { sharedViteConfig } from '@learn-viteplus/shared'
+import { defineConfig } from 'vite-plus'
 
-export default defineConfig(({ mode }): UserConfig => {
-  const env = loadEnv(mode, '.', '')
-  const reporters: TestUserConfig['reporters'] = ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]]
-
-  if (env.GITHUB_ACTIONS === 'true') {
-    reporters.push('github-actions')
-  }
+export default defineConfig(() => {
+  const base = sharedViteConfig(import.meta.dirname)
 
   return {
+    ...base,
     pack: {
       dts: { tsgo: true },
+      deps: {
+        neverBundle: ['cloudflare:workers', 'h3'],
+      },
       exports: true,
     },
-    test: {
-      include: ['tests/**/*.spec.ts'],
-      reporters,
-      coverage: {
-        enabled: 'GITHUB_ACTIONS' in env,
-        provider: 'istanbul',
-        include: ['src/**'],
-        reportsDirectory: 'tests/reports/coverage',
-      },
-    },
-  }
+  } as ReturnType<typeof sharedViteConfig>
 })
