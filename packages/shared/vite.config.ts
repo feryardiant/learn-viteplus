@@ -12,7 +12,17 @@ export default defineConfig(({ mode }): UserConfig => {
     pack: {
       entry: ['src/*.ts'],
       dts: { tsgo: true },
-      exports: true,
+      exports: {
+        customExports(exports) {
+          exports['.'] = { types: './src/index.ts', import: exports['.'] }
+          exports['./vite'] = { types: './src/vite.ts', import: exports['./vite'] }
+          exports['./vitest-app'] = { types: './src/vitest-app.ts', import: exports['./vitest-app'] }
+          exports['./vitest-worker'] = { types: './src/vitest-worker.ts', import: exports['./vitest-worker'] }
+          exports['./tsconfig.json'] = './tsconfig.json'
+
+          return exports
+        },
+      },
       deps: {
         neverBundle: [
           'vite-plus',

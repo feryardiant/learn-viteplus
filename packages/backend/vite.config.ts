@@ -11,7 +11,14 @@ export default defineConfig(() => {
       deps: {
         neverBundle: ['cloudflare:workers', 'h3'],
       },
-      exports: true,
+      exports: {
+        customExports(exports) {
+          exports['.'] = { types: './src/index.ts', import: exports['.'] }
+          exports['./tsconfig.json'] = './tsconfig.json'
+
+          return exports
+        },
+      },
     },
   } as ReturnType<typeof sharedViteConfig>
 })
