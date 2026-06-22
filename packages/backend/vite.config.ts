@@ -12,8 +12,8 @@ export default defineConfig(() => {
         neverBundle: ['cloudflare:workers', 'h3'],
       },
       exports: {
+        devExports: true,
         customExports(exports) {
-          exports['.'] = { types: './src/index.ts', import: exports['.'] }
           exports['./tsconfig.json'] = './tsconfig.json'
 
           return exports

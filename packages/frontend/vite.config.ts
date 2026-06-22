@@ -15,14 +15,13 @@ export default defineConfig(() => {
       },
       entry: ['./src/*.ts'],
       exports: {
+        devExports: true,
         customExports(exports) {
           exports['.'] = {
             style: './style.css',
-            types: './src/index.ts',
-            import: exports['.'],
+            default: exports['.'],
           }
 
-          exports['./components'] = { types: './src/components.ts', import: exports['./components'] }
           exports['./assets/*'] = './assets/*'
           exports['./tsconfig.json'] = './tsconfig.json'
 

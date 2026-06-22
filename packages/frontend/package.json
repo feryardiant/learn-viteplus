@@ -19,17 +19,26 @@
   "exports": {
     ".": {
       "style": "./style.css",
-      "types": "./src/index.ts",
-      "import": "./dist/index.js"
+      "default": "./src/index.ts"
     },
-    "./components": {
-      "types": "./src/components.ts",
-      "import": "./dist/components.js"
-    },
+    "./components": "./src/components.ts",
     "./package.json": "./package.json",
     "./style.css": "./dist/style.css",
     "./assets/*": "./assets/*",
     "./tsconfig.json": "./tsconfig.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "style": "./style.css",
+        "default": "./dist/index.js"
+      },
+      "./components": "./dist/components.js",
+      "./package.json": "./package.json",
+      "./style.css": "./dist/style.css",
+      "./assets/*": "./assets/*",
+      "./tsconfig.json": "./tsconfig.json"
+    }
   },
   "scripts": {
     "build": "vp pack",
