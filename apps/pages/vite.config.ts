@@ -1,36 +1,19 @@
-import path from 'node:path'
-import { fileURLToPath, URL } from 'node:url'
-
 import { cloudflare } from '@cloudflare/vite-plugin'
+import { sharedViteConfig } from '@learn-viteplus/shared'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import { defineConfig, loadEnv, type TestUserConfig } from 'vite-plus'
+import { defineConfig, loadEnv } from 'vite-plus'
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, '.', '')
-  const root = fileURLToPath(new URL('./', import.meta.url))
-  const reporters: TestUserConfig['reporters'] = ['default', ['junit', { outputFile: 'tests/reports/junit.xml' }]]
-
-  if (env.GITHUB_ACTIONS === 'true') {
-    reporters.push('github-actions')
-  }
+  const env = loadEnv(mode, import.meta.dirname, '')
+  const config = sharedViteConfig(import.meta.dirname)
 
   return {
-    resolve: {
-      alias: {
-        '@': path.join(root, 'src'),
-      },
-    },
+    ...config,
     test: {
+      ...config.test,
       projects: ['vitest.*.config.ts'],
-      reporters,
-      coverage: {
-        enabled: 'GITHUB_ACTIONS' in env,
-        provider: 'istanbul',
-        include: ['src/**', 'worker/**'],
-        reportsDirectory: 'tests/reports/coverage',
-      },
     },
     plugins: [
       env.VITEST
