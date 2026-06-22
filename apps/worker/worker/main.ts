@@ -1,7 +1,9 @@
+import { createApiRoutes } from '@learn-viteplus/backend'
 import { H3, html } from 'h3/cloudflare'
 
-import { render } from '../src/ssr.ts'
-import { apiRoutes } from './routes'
+import { render } from '@/ssr.ts'
+
+const api = createApiRoutes()
 
 const app = new H3({
   onError(error, { res }) {
@@ -28,7 +30,7 @@ app.use(({ context: { env }, req }, next) => {
   return next()
 })
 
-app.mount('/api', apiRoutes)
+app.mount('/api', api)
 
 app.get('/**', async ({ context: { env }, req }) => {
   const body = await env.ASSETS.fetch(new URL('/index.html', req.url)).then(async (res) => {

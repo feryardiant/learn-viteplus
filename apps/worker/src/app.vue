@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Tick from '@/components/tick.vue'
+import { Tick } from '@learn-viteplus/frontend/components'
 </script>
 
 <template>

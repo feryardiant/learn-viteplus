@@ -1,6 +1,6 @@
 import { createApp } from './app'
 
-import './style.css'
+import '@learn-viteplus/frontend/style.css'
 
 const { app, router } = createApp(import.meta.env.BASE_URL)
 

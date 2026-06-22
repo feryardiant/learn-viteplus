@@ -1,12 +1,10 @@
 <script setup lang="ts">
+import { useCounterStore } from '@learn-viteplus/frontend'
+import heroImg from '@learn-viteplus/frontend/assets/hero.png'
+import typescriptLogo from '@learn-viteplus/frontend/assets/typescript.svg'
+import viteLogo from '@learn-viteplus/frontend/assets/vite.svg'
+import { Card, Tick, type CardLinkProp } from '@learn-viteplus/frontend/components'
 import { onMounted } from 'vue'
-
-import heroImg from '@/assets/hero.png'
-import typescriptLogo from '@/assets/typescript.svg'
-import viteLogo from '@/assets/vite.svg'
-import Card, { type CardLinkProp } from '@/components/card.vue'
-import Tick from '@/components/tick.vue'
-import { useCounterStore } from '@/stores/counter'
 
 const counter = useCounterStore()
 
