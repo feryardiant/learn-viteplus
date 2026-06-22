@@ -1,0 +1,51 @@
+{
+  "name": "@learn-viteplus/worker",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
+  "repository": {
+    "directory": "apps/worker"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "migrate": "wrangler d1 migrations apply learn-viteplus",
+    "migration:make": "wrangler d1 migrations create learn-viteplus",
+    "migration:list": "wrangler d1 migrations list learn-viteplus",
+    "prepare": "wrangler types worker/wrangler.d.ts",
+    "preview": "vp preview",
+    "test": "vp test",
+    "wrangler": "wrangler"
+  },
+  "dependencies": {
+    "h3": "catalog:",
+    "pinia": "catalog:",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "catalog:",
+    "@cloudflare/vitest-pool-workers": "catalog:",
+    "@fontsource-variable/roboto": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@types/jsdom": "catalog:",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "@vue/tsconfig": "catalog:",
+    "jsdom": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-vue-devtools": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:",
+    "wrangler": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

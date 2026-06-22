@@ -4,16 +4,18 @@ Monorepo: Vue 3 web app + TypeScript library, managed by Vite+.
 
 ## Operational Mandates
 
-- **Metadata Management**: ALL AI-generated metadata (plans, specs, and design documents) MUST be stored exclusively in the `.agents/` directory (e.g., `.agents/plans/`, `.agents/specs/`). Do not use any other directory for persistent or temporary agent artifacts.
+- **Metadata Management**: ALL AI-generated metadata (plans, specs, and design documents) _MUST_ be stored exclusively in the `.agents/` directory (e.g., `.agents/plans/`, `.agents/specs/`). _DO NOT_ use any other directory for persistent or temporary agent artifacts.
 
-## Package map
+## Packages
 
-| workspace                | path              | readme                     |
-| ------------------------ | ----------------- | -------------------------- |
-| `@feryardiant/lvp-web`   | `apps/website/`   | `apps/website/README.md`   |
-| `@feryardiant/lvp-utils` | `packages/utils/` | `packages/utils/README.md` |
+| Package                                            |
+| -------------------------------------------------- |
+| [`@learn-viteplus/pages`](`apps/pages/`)           |
+| [`@learn-viteplus/worker`](`apps/worker/`)         |
+| [`@learn-viteplus/backend`](`packages/backend/`)   |
+| [`@learn-viteplus/frontend`](`packages/frontend/`) |
 
-- Any new app (located in `apps/`) or package (located in `packages/`) should named with `@feryardiant/lvp-` prefix
+- Any new app (located in `apps/`) or package (located in `packages/`) should named with `@learn-viteplus/` prefix
 
 ## Commands
 
@@ -40,8 +42,8 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 
 - Tests import from `vite-plus/test` (not `vitest` directly)
 - Website tests use `@vue/test-utils` + `jsdom` environment
-- Config lives in `apps/website/vite.config.ts` (`test.environment: 'jsdom'`)
-- E2e tests live in `tests/e2e/`, run via `vp test --project @feryardiant/learn-viteplus`
+- Config lives in `vite.config.ts` (mainly) within each respective packages, for `apps` that has 2 different environment it has to be splitted into `vitest.{env}.config.ts`
+- E2e tests live in root `tests/e2e/`, run via `vp test --project @feryardiant/learn-viteplus`
 - E2e uses Playwright (`chromium`) + a `globalSetup` (`tests/setup-server.ts`) that spawns the dev server
 
 ## Code style

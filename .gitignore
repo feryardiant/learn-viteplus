@@ -45,6 +45,7 @@ GEMINI.md
 .wrangler
 node_modules
 reports
+wrangler.d.ts
 
 # Node.js lock files
 .pnpm-store
