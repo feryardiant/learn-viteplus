@@ -1,14 +1,13 @@
 {
   "extends": "./tsconfig.app.json",
-
   "include": ["worker/**/*.ts"],
   "exclude": [],
-
   "compilerOptions": {
     "lib": [],
     "types": ["@cloudflare/vitest-pool-workers/types", "node", "vite-plus/client", "./worker/wrangler.d.ts"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "~/*": ["./worker/*"]
     },
 
     "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.node.tsbuildinfo"

@@ -1,17 +1,15 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["src/*.d.ts", "src/**/*.ts", "src/**/*.vue"],
+  "include": ["src/**/*.ts", "src/**/*.vue"],
   "exclude": [],
   "compilerOptions": {
-    "noUncheckedIndexedAccess": true,
-    "forceConsistentCasingInFileNames": true,
-
     "types": ["vite-plus/client"],
-
     "paths": {
       "@/*": ["./src/*"]
     },
 
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
     "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.app.tsbuildinfo"
   }
 }

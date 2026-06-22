@@ -7,6 +7,7 @@ import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite-plus'
 
 import pkg from './package.json' with { type: 'json' }
+
 export default defineConfig(async () => {
   const migrations = await readD1Migrations(join(import.meta.dirname, 'migrations'))
 
