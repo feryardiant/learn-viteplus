@@ -7,7 +7,7 @@ export default defineConfig(() => {
   return {
     ...base,
     pack: {
-      entry: ['src/index.ts', 'src/vite.ts'],
+      entry: ['src/index.ts'],
       dts: { tsgo: true },
       deps: {
         neverBundle: ['cloudflare:workers', 'h3'],
