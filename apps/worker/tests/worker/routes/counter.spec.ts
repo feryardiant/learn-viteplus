@@ -1,3 +1,4 @@
+import type { Counter } from '@learn-viteplus/backend'
 import { createExecutionContext, waitOnExecutionContext } from 'cloudflare:test'
 import { env } from 'cloudflare:workers'
 import { describe, expect, it } from 'vite-plus/test'
@@ -23,11 +24,6 @@ describe('integration', () => {
   }
 
   async function getCounterDB(ip: string) {
-    interface Counter {
-      ip_address: string
-      count: number
-    }
-
     const counter = await env.DB.prepare('SELECT * FROM counters WHERE ip_address = ?').bind(ip).first<Counter>()
 
     expect(counter).not.toBeNull()
