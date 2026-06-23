@@ -16,12 +16,14 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./vite": "./src/vite.ts",
     "./package.json": "./package.json",
     "./tsconfig.json": "./tsconfig.json"
   },
   "publishConfig": {
     "exports": {
       ".": "./dist/index.mjs",
+      "./vite": "./dist/vite.mjs",
       "./package.json": "./package.json",
       "./tsconfig.json": "./tsconfig.json"
     }

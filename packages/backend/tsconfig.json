@@ -6,7 +6,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
-    "types": ["node", "./wrangler.d.ts"],
+    "types": ["@cloudflare/vitest-pool-workers/types", "node", "vite-plus/client", "./wrangler.d.ts"],
     "strict": true,
     "noUnusedLocals": true,
     "declaration": true,
