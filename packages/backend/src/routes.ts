@@ -3,6 +3,8 @@ import type { H3 as H3Type } from 'h3'
 
 import { counterRoutes } from './routes/counter.ts'
 
+export type { Counter } from './routes/counter.ts'
+
 export function createApiRoutes(): H3Type {
   const app = new H3()
 
