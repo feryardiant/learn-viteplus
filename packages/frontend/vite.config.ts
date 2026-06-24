@@ -1,4 +1,5 @@
 import { sharedViteConfig } from '@learn-viteplus/shared'
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vuePack from 'unplugin-vue/rolldown'
 import { defineConfig } from 'vite-plus'
@@ -19,7 +20,7 @@ export default defineConfig(() => {
         customExports(exports) {
           exports['.'] = {
             style: './style.css',
-            default: exports['.'],
+            import: exports['.'],
           }
 
           exports['./assets/*'] = './assets/*'
@@ -31,7 +32,7 @@ export default defineConfig(() => {
       platform: 'neutral',
       plugins: [vuePack({})],
     },
-    plugins: [vue()],
+    plugins: [vue(), tailwindcss()],
     test: {
       ...base.test,
       environment: 'jsdom',

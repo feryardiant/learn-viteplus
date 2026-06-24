@@ -13,7 +13,7 @@ export function createApiRoutes(): H3Type {
    */
   app.use(({ req }, next) => {
     if (!req.ip) {
-      req.ip = req.headers.get('cf-connecting-ip') || undefined
+      req.ip = req.headers.get('cf-connecting-ip') as string
     }
 
     return next()

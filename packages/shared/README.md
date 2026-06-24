@@ -1,3 +1,3 @@
-# The Back-end
+# The Shared
 
-A shared back-end library for `learn-viteplus` Pages and Worker.
+A shared library for `learn-viteplus` Pages and Worker.

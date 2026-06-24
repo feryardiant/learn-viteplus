@@ -16,7 +16,7 @@ URL: [`https://learn-viteplus.pages.dev/`](https://learn-viteplus.pages.dev/)
 
 ## Project structure
 
-```
+```text
 src/
 ├── assets/       # Static images (hero.png, svgs)
 ├── components/   # card.vue, external-link.vue, tick.vue

@@ -8,12 +8,12 @@ Monorepo: Vue 3 web app + TypeScript library, managed by Vite+.
 
 ## Packages
 
-| Package                                            |
-| -------------------------------------------------- |
-| [`@learn-viteplus/pages`](`apps/pages/`)           |
-| [`@learn-viteplus/worker`](`apps/worker/`)         |
-| [`@learn-viteplus/backend`](`packages/backend/`)   |
-| [`@learn-viteplus/frontend`](`packages/frontend/`) |
+| Package                                         |
+| ----------------------------------------------- |
+| [`@learn-viteplus/pages`](apps/pages)           |
+| [`@learn-viteplus/worker`](apps/worker)         |
+| [`@learn-viteplus/backend`](packages/backend)   |
+| [`@learn-viteplus/frontend`](packages/frontend) |
 
 - Any new app (located in `apps/`) or package (located in `packages/`) should named with `@learn-viteplus/` prefix
 

@@ -19,7 +19,7 @@
   "exports": {
     ".": {
       "style": "./style.css",
-      "default": "./src/index.ts"
+      "import": "./src/index.ts"
     },
     "./components": "./src/components.ts",
     "./package.json": "./package.json",
@@ -31,7 +31,7 @@
     "exports": {
       ".": {
         "style": "./style.css",
-        "default": "./dist/index.js"
+        "import": "./dist/index.js"
       },
       "./components": "./dist/components.js",
       "./package.json": "./package.json",
@@ -52,7 +52,6 @@
     "vue-router": "catalog:"
   },
   "devDependencies": {
-    "@fontsource-variable/roboto": "catalog:",
     "@learn-viteplus/shared": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "@types/jsdom": "catalog:",

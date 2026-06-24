@@ -16,7 +16,7 @@ URL: [`https://learn-viteplus.feryardiant.workers.dev/`](https://learn-viteplus.
 
 ## Project structure
 
-```
+```text
 src/
 ├── assets/       # Static images (hero.png, svgs)
 ├── components/   # card.vue, external-link.vue, tick.vue
