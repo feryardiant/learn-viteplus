@@ -42,6 +42,7 @@ describe('counter routes', () => {
   })
 
   it('PUT /api/counter increments', async () => {
+    // await fetchCounterApi('172.16.0.1')
     const body = await fetchCounterApi('172.16.0.1', 'PUT')
 
     expect(body.count).toBe(1)

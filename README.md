@@ -6,12 +6,12 @@ A Vue 3 web app + TypeScript library, managed as a Vite+ monorepo.
 
 ## Packages
 
-| Package                                            | Build                          |
-| -------------------------------------------------- | ------------------------------ |
-| [`@learn-viteplus/pages`](`apps/pages/`)           | `vp build` → Cloudflare Pages  |
-| [`@learn-viteplus/worker`](`apps/worker/`)         | `vp build` → Cloudflare Worker |
-| [`@learn-viteplus/backend`](`packages/backend/`)   | `vp pack` (tsdown) → `dist/`   |
-| [`@learn-viteplus/frontend`](`packages/frontend/`) | `vp pack` (tsdown) → `dist/`   |
+| Package                                          | Build                          |
+| ------------------------------------------------ | ------------------------------ |
+| [`@learn-viteplus/pages`](apps/pages/)           | `vp build` → Cloudflare Pages  |
+| [`@learn-viteplus/worker`](apps/worker/)         | `vp build` → Cloudflare Worker |
+| [`@learn-viteplus/backend`](packages/backend/)   | `vp pack` (tsdown) → `dist/`   |
+| [`@learn-viteplus/frontend`](packages/frontend/) | `vp pack` (tsdown) → `dist/`   |
 
 ## CI/CD Pipeline
 

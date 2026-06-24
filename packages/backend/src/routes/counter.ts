@@ -36,7 +36,7 @@ export const counterRoutes: H3Type = new H3()
     const counter = await db('SELECT count FROM counters WHERE ip_address = ?', req.ip).first<Counter>()
     let count = counter?.count ?? 0
 
-    if (counter !== null) {
+    if (count === 0) {
       count++
       await db('UPDATE counters SET count = ? WHERE ip_address = ?', count, req.ip).run()
     }
