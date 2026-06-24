@@ -2,32 +2,31 @@
   "name": "@feryardiant/learn-viteplus",
   "version": "0.0.1",
   "private": true,
-  "homepage": "https://github.com/feryardiant/learn-viteplus#readme",
-  "bugs": {
-    "url": "https://github.com/feryardiant/learn-viteplus/issues"
-  },
   "license": "MIT",
   "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
   "workspaces": [
     "apps/*",
-    "packages/*",
-    "tools/*"
+    "packages/*"
   ],
   "type": "module",
   "scripts": {
     "bump": "bumpp -y -r",
+    "dev:pages": "vp run @learn-viteplus/pages#dev",
+    "dev:worker": "vp run @learn-viteplus/worker#dev",
     "ready": "vp check && vp run -r test && vp run -r build",
-    "dev": "vp run @feryardiant/lvp-web#dev",
     "prepare": "vp config"
   },
   "devDependencies": {
     "@codecov/bundle-analyzer": "catalog:",
+    "@tsdown/css": "^0.22.3",
     "@types/node": "catalog:",
     "@vitest/coverage-istanbul": "catalog:",
     "bumpp": "catalog:",
     "playwright": "^1.61.0",
     "tinyglobby": "^0.2.17",
-    "vite-plus": "catalog:"
+    "unplugin-vue": "^7.2.0",
+    "vite-plus": "catalog:",
+    "vue-tsc": "^3.3.5"
   },
   "overrides": {
     "vite": "catalog:",
@@ -38,17 +37,30 @@
   },
   "packageManager": "bun@1.3.14",
   "catalog": {
+    "@cloudflare/vite-plugin": "^1.40.2",
+    "@cloudflare/vitest-pool-workers": "^0.16.16",
     "@codecov/bundle-analyzer": "^2.0.1",
+    "@fontsource-variable/roboto": "^5.2.10",
     "@tailwindcss/vite": "~4.3.1",
     "@types/node": "~24.13.2",
+    "@types/jsdom": "^28.0.1",
     "@typescript/native-preview": "7.0.0-dev.20260611.2",
     "@vitest/coverage-istanbul": "^4.1.9",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.9.1",
     "bumpp": "^11.1.0",
+    "h3": "^2.0.1-rc.22",
+    "jsdom": "^29.0.2",
+    "pinia": "^3.0.4",
     "tailwindcss": "~4.3.1",
     "typescript": "~6.0.2",
+    "vite-plugin-vue-devtools": "^8.1.1",
     "vite": "npm:@voidzero-dev/vite-plus-core@latest",
     "vitest": "^4.1.9",
     "vite-plus": "^0.2.1",
+    "vue": "^3.5.38",
+    "vue-router": "^5.0.4",
     "wrangler": "^4.99.0"
   }
 }

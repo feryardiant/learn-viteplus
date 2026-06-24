@@ -1,0 +1,49 @@
+{
+  "name": "@learn-viteplus/backend",
+  "version": "0.0.1",
+  "private": true,
+  "description": "A shared back-end library for `learn-viteplus` Pages and Worker.",
+  "license": "MIT",
+  "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
+  "repository": {
+    "directory": "packages/backend"
+  },
+  "files": [
+    "dist",
+    "src",
+    "tsconfig.json"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json",
+    "./tsconfig.json": "./tsconfig.json"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": "./dist/index.mjs",
+      "./package.json": "./package.json",
+      "./tsconfig.json": "./tsconfig.json"
+    }
+  },
+  "scripts": {
+    "build": "vp pack",
+    "check": "vp check",
+    "dev": "vp pack --watch",
+    "prepare": "wrangler types wrangler.d.ts",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "h3": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "catalog:",
+    "@learn-viteplus/shared": "workspace:*",
+    "@types/node": "catalog:",
+    "@typescript/native-preview": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:",
+    "wrangler": "catalog:"
+  }
+}
