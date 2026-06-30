@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.40.2",
-    "@cloudflare/vitest-pool-workers": "^0.16.16",
+    "@cloudflare/vitest-pool-workers": "^0.17.0",
     "@fontsource-variable/roboto": "^5.2.10",
     "@tailwindcss/vite": "catalog:",
     "@types/jsdom": "^28.0.1",
