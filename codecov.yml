@@ -3,17 +3,30 @@ comment:
 
 coverage:
   status:
-    project:
-      website:
-        threshold: 10%
-        flags:
-          - functionals
-        paths:
-          - apps/website
+    default_rules:
+      threshold: 10%
 
-      utils:
-        threshold: 10%
+    project:
+      pages:
         flags:
           - functionals
         paths:
-          - packages/utils
+          - apps/pages
+
+      worker:
+        flags:
+          - functionals
+        paths:
+          - apps/worker
+
+      backend:
+        flags:
+          - functionals
+        paths:
+          - packages/backend
+
+      frontend:
+        flags:
+          - functionals
+        paths:
+          - packages/frontend

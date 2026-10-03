@@ -16,7 +16,7 @@ export default defineConfig(({ mode }): UserConfig => {
     },
     test: {
       projects: [
-        'apps/website/vitest.*.config.ts',
+        'apps/*/vitest.*.config.ts',
         'packages/*',
         {
           test: {

@@ -4,16 +4,16 @@ Learning **Vite+** (monorepo tooling) and **Cloudflare** (Pages, Workers, edge c
 
 A Vue 3 web app + TypeScript library, managed as a Vite+ monorepo.
 
-## Architecture
+## Packages
 
-| Package                  | Path              | Build                         |
-| ------------------------ | ----------------- | ----------------------------- |
-| `@feryardiant/lvp-web`   | `apps/website/`   | `vp build` → Cloudflare Pages |
-| `@feryardiant/lvp-utils` | `packages/utils/` | `vp pack` (tsdown) → `dist/`  |
+| Package                                          | Build                          |
+| ------------------------------------------------ | ------------------------------ |
+| [`@learn-viteplus/pages`](apps/pages/)           | `vp build` → Cloudflare Pages  |
+| [`@learn-viteplus/worker`](apps/worker/)         | `vp build` → Cloudflare Worker |
+| [`@learn-viteplus/backend`](packages/backend/)   | `vp pack` (tsdown) → `dist/`   |
+| [`@learn-viteplus/frontend`](packages/frontend/) | `vp pack` (tsdown) → `dist/`   |
 
 ## CI/CD Pipeline
-
-All three workflows use `pull_request_target` to safely access secrets from fork PRs (unlike `pull_request` which doesn't provide secrets for forks).
 
 ```mermaid
 flowchart TD
@@ -38,11 +38,11 @@ flowchart TD
   end
 ```
 
-| Workflow      | Event                                                       | What it does                                                              |
-| ------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `code.yml`    | `pull_request_target [opened, synchronize]` + `push [main]` | Lint, functional tests (matrix), e2e tests, then call `dist.yml`          |
-| `dist.yml`    | `workflow_call` + `workflow_dispatch`                       | Build website, deploy to CF Pages                                         |
-| `cleanup.yml` | `pull_request_target [closed]` + `schedule`                 | Cleanup on PR close; weekly prune stale previews & old production deploys |
+| Workflow      | Event                                                | What it does                                                              |
+| ------------- | ---------------------------------------------------- | ------------------------------------------------------------------------- |
+| `code.yml`    | `pull_request [opened, synchronize]` + `push [main]` | Lint, functional tests (matrix), e2e tests, then call `dist.yml`          |
+| `dist.yml`    | `workflow_call` + `workflow_dispatch`                | Build website, deploy to CF Pages                                         |
+| `cleanup.yml` | `pull_request_target [closed]` + `schedule`          | Cleanup on PR close; weekly prune stale previews & old production deploys |
 
 ## Key Learnings
 

@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.node.json",
+  "include": ["src/*.d.ts", "tests/**/*.ts"],
+  "exclude": [],
+  "compilerOptions": {
+    "types": ["@cloudflare/vitest-pool-workers/types", "node", "vite-plus/test/jsdom", "./worker/wrangler.d.ts"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "~/*": ["./worker/*"]
+    },
+
+    "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.vitest.tsbuildinfo"
+  }
+}

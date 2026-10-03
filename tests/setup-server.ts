@@ -12,7 +12,7 @@ async function startServer(): Promise<string> {
     let settled = false
     let errorMessage = ''
 
-    const proc = spawn('vp', ['run', '@feryardiant/lvp-web#dev'], {
+    const proc = spawn('vp', ['run', '@learn-viteplus/worker#dev'], {
       cwd: dirname(import.meta.dirname),
       stdio: 'pipe',
       env: process.env,
