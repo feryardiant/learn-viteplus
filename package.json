@@ -22,7 +22,7 @@
     "@types/node": "catalog:",
     "@vitest/coverage-istanbul": "catalog:",
     "bumpp": "catalog:",
-    "playwright": "^1.61.0",
+    "playwright": "^1.63.0",
     "tinyglobby": "^0.2.17",
     "unplugin-vue": "^7.2.0",
     "vite-plus": "catalog:",
