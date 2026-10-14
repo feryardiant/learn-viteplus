@@ -16,6 +16,8 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    outputs:
+      pkgs-list: ${{ steps.pkgs.outputs.list }}
 
     steps:
       - name: Checkout
@@ -33,6 +35,15 @@ jobs:
       - name: Check
         run: vp check
 
+      - name: List Packages
+        id: pkgs
+        run: |
+          PKGS=$(find apps packages -maxdepth 2 -name "package.json" \
+            -exec sh -c 'test -d "$(dirname "$1")/tests"' _ {} \; -print \
+            | xargs jq -r '.name' | jq -R -s 'split("\n") | map(select(length > 0))' -c)
+
+          echo "list=$PKGS" >> $GITHUB_OUTPUT
+
   functional:
     name: Test `${{ matrix.pkg }}`
     runs-on: ubuntu-latest
@@ -41,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pkg: ['@feryardiant/lvp-utils', '@feryardiant/lvp-web']
+        pkg: ${{ fromJSON(needs.lint.outputs.pkgs-list) }}
 
     steps:
       - name: Checkout
@@ -62,6 +73,7 @@ jobs:
           PKG_PATH=$(find apps packages -name "package.json" -not -path "*/node_modules/*" \
             -exec jq -r "select(.name == \"${{ matrix.pkg }}\") | input_filename | split(\"/\")[0:-1] | join(\"/\")" {} \;)
 
+          echo "name=${PKG_PATH#@learn-viteplus/}" >> $GITHUB_OUTPUT
           echo "path=$PKG_PATH" >> $GITHUB_OUTPUT
 
       - name: Test

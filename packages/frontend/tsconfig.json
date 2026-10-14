@@ -1,0 +1,17 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": ["./src/**/*.ts", "./src/**/*.vue"],
+  "exclude": [],
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "types": ["node", "vite-plus/client", "jsdom"],
+
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    "tsBuildInfoFile": "./node_modules/.vite-temp/tsconfig.frontend.tsbuildinfo"
+  }
+}
