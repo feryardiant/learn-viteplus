@@ -17,6 +17,5 @@ updates:
     labels:
       - dependencies
     groups:
-      dev-utils:
-        patterns:
-          - '@typescript/native-preview'
+      dependencies:
+        patterns: ['*']
