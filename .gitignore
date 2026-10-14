@@ -43,6 +43,7 @@ GEMINI.md
 .env
 .tool-versions
 .wrangler
+.vitest/
 node_modules
 reports
 wrangler.d.ts
